@@ -165,17 +165,20 @@ def classify_samples(meta_df: pd.DataFrame) -> dict[str, list[str]]:
 
     Inspects Sample_characteristics_ch1 (and ch2 if present) for keywords.
     """
+    # Always include title/source/description alongside characteristics — GEO datasets
+    # often store the condition label in Sample_title rather than characteristics.
     char_cols = [c for c in meta_df.columns if "characteristics" in c.lower()]
-    if not char_cols:
-        # Fall back to Sample_source_name or Sample_title
-        char_cols = [c for c in meta_df.columns if any(
-            k in c.lower() for k in ("source_name", "title", "description")
-        )]
+    title_cols = [c for c in meta_df.columns if any(
+        k in c.lower() for k in ("source_name", "title", "description")
+    )]
+    search_cols = list(dict.fromkeys(char_cols + title_cols))  # preserve order, deduplicate
+    if not search_cols:
+        search_cols = list(meta_df.columns)
 
     groups: dict[str, list[str]] = {"healthy": [], "sirs_oohca": []}
 
     for sample_id, row in meta_df.iterrows():
-        combined = " ".join(str(row[c]) for c in char_cols if c in row.index).lower()
+        combined = " ".join(str(row[c]) for c in search_cols if c in row.index).lower()
         if any(k in combined for k in _HEALTHY_KEYWORDS):
             groups["healthy"].append(sample_id)
         elif any(k in combined for k in _SIRS_KEYWORDS):

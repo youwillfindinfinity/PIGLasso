@@ -31,7 +31,9 @@ def main() -> None:
 @click.option("--data", required=True,
               help="Path to expression matrix TSV (genes × samples).")
 @click.option("--prior", default=None,
-              help="Path to prior matrix .npy file (optional, reserved for future use).")
+              help="Path to prior matrix .npy file (p×p, values in [0,1]).")
+@click.option("--prior-weight", default=0.5, show_default=True,
+              help="Prior weight α: effective λ_ij = λ · (1 − α · P_ij). 0 = no effect.")
 @click.option("--n-subsamples", default=200, show_default=True,
               help="Number of subsamples (Q).")
 @click.option("--b-perc", default=0.65, show_default=True,
@@ -49,7 +51,7 @@ def main() -> None:
 @click.option("--seed", default=42, show_default=True, help="Random seed.")
 @click.option("--out", default="results/piglasso/", show_default=True,
               help="Output directory.")
-def run(data, prior, n_subsamples, b_perc, lambda_lo, lambda_hi, lambda_len,
+def run(data, prior, prior_weight, n_subsamples, b_perc, lambda_lo, lambda_hi, lambda_len,
         pi_thr, n_jobs, seed, out):
     """Run PIGLasso stability-selection inference on an expression matrix."""
     import numpy as np
@@ -63,9 +65,17 @@ def run(data, prior, n_subsamples, b_perc, lambda_lo, lambda_hi, lambda_len,
     X = df.T.values.astype(float)
     click.echo(f"Loaded: {X.shape[0]} samples × {X.shape[1]} genes  ({data})")
 
+    prior_matrix = None
     if prior:
-        click.echo(f"NOTE: --prior provided ({prior}). Prior weighting is reserved for future use; "
-                   "running unweighted stability selection.", err=True)
+        prior_matrix = np.load(prior)
+        if prior_matrix.shape != (X.shape[1], X.shape[1]):
+            click.echo(
+                f"ERROR: prior shape {prior_matrix.shape} does not match gene count "
+                f"{X.shape[1]}. Prior must be ({X.shape[1]}, {X.shape[1]}).",
+                err=True,
+            )
+            raise SystemExit(1)
+        click.echo(f"Loaded prior: {prior_matrix.shape}, weight α={prior_weight}")
 
     est = PIGLassoEstimator(
         Q=n_subsamples,
@@ -74,10 +84,11 @@ def run(data, prior, n_subsamples, b_perc, lambda_lo, lambda_hi, lambda_len,
         lambda_hi=lambda_hi,
         n_lambda=lambda_len,
         pi_thr=pi_thr,
+        prior_weight=prior_weight,
         n_jobs=n_jobs,
         seed=seed,
     )
-    est.fit(X)
+    est.fit(X, prior=prior_matrix)
     adj = est.get_adjacency()
 
     stem = pathlib.Path(data).stem

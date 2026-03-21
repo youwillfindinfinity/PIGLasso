@@ -1,0 +1,21 @@
+# Core dependencies (matches pyproject.toml [project.dependencies])
+# PIGLasso requires nodis — install nodis first or use: pip install -e ../NODIS
+nodis
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0
+networkx>=3.1
+click>=8.1
+joblib>=1.3
+matplotlib>=3.7
+requests>=2.28
+gglasso>=0.3
+
+# Optional: R bridge for legacy pipeline_src/ inference scripts
+# Requires R 4.x with the 'glasso' package installed.
+# Install with: pip install "piglasso[r]"
+# rpy2>=3.5
+
+# Development (install with: pip install "piglasso[dev]")
+# pytest>=7.4
+# pytest-cov>=4.1

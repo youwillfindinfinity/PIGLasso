@@ -1,0 +1,71 @@
+#!/bin/bash
+#SBATCH --job-name=pig_burns
+#SBATCH --output=logs/pig_burns_%j.out
+#SBATCH --error=logs/pig_burns_%j.err
+#SBATCH --time=08:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+# Partition is set at submission time:
+#   sbatch --partition=rome jobs/piglasso_burns.job
+
+# -----------------------------------------------------------------------
+# PIGLasso burn inference — GSE182616 with STRING+KEGG prior
+#
+# Prerequisites (must exist before submitting):
+#   data/burn/expression.tsv     — genes x samples, preprocessed from GSE182616
+#   pipeline_src/prior/prior_piglasso.npy  — (p,p) prior matrix
+#
+# Output:
+#   results/burns/expression_adjacency.csv   — binary adjacency
+#   results/burns/expression_stability.csv   — stability scores
+# -----------------------------------------------------------------------
+
+set -euo pipefail
+
+PIGLASSO_DIR="$HOME/PIGLasso"
+NODIS_VENV="$HOME/NODIS/.venv"
+
+# Activate NODIS venv (contains nodis + gglasso)
+source "${NODIS_VENV}/bin/activate"
+
+# Install PIGLasso into the active venv if not already present
+python -c "import piglasso" 2>/dev/null || \
+    pip install -e "${PIGLASSO_DIR}" --quiet
+
+cd "${PIGLASSO_DIR}"
+mkdir -p logs results/burns
+
+EXPR_TSV="${PIGLASSO_DIR}/data/burn/expression.tsv"
+PRIOR_NPY="${PIGLASSO_DIR}/pipeline_src/prior/prior_piglasso.npy"
+
+if [[ ! -f "${EXPR_TSV}" ]]; then
+    echo "[ERROR] Burn expression TSV not found: ${EXPR_TSV}" >&2
+    echo "[ERROR] Run pipeline_src/preprocessing/burn/preprocess_burn.ipynb first." >&2
+    exit 1
+fi
+
+if [[ ! -f "${PRIOR_NPY}" ]]; then
+    echo "[ERROR] Prior matrix not found: ${PRIOR_NPY}" >&2
+    exit 1
+fi
+
+echo "[INFO] Expression: ${EXPR_TSV}"
+echo "[INFO] Prior:      ${PRIOR_NPY}"
+echo "[INFO] CPUs:       ${SLURM_CPUS_PER_TASK}"
+
+piglasso run \
+    --data          "${EXPR_TSV}"              \
+    --prior         "${PRIOR_NPY}"             \
+    --prior-weight  0.5                        \
+    --n-subsamples  200                        \
+    --b-perc        0.65                       \
+    --lambda-lo     0.05                       \
+    --lambda-hi     0.30                       \
+    --lambda-len    20                         \
+    --pi-thr        0.5                        \
+    --n-jobs        "${SLURM_CPUS_PER_TASK}"   \
+    --seed          42                         \
+    --out           results/burns/
+
+echo "[INFO] Done. Results written to results/burns/"
