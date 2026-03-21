@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name=prior_step2b
+#SBATCH --output=logs/prior_step2b_%j.out
+#SBATCH --error=logs/prior_step2b_%j.err
+#SBATCH --time=00:30:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=16G
+
+set -euo pipefail
+source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+echo "[$(date)] Step 2b: KEGG pathway prior"
+python "$HOME/NODIS/methodtotest/build_prior.py" --step 2b
+echo "[$(date)] Step 2b done"

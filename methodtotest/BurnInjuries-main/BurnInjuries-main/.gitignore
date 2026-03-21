@@ -1,0 +1,46 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Folders
+burn_data/
+
+inference/results/network_inference
+inference/results/piglasso
+inference/results/pca
+
+trauma_data/
+trauma_results/
+
+chronic_data/ensembl/
+
+benchmarking/data/dream
+benchmarking/data/SGG
+benchmarking/data/GRN
+benchmarking/results/
+
+preprocessing/burn/filtered
+preprocessing/burn/stratified
+preprocessing/data/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# macOS junk
+.DS_Store
+
+# Local credentials — never commit
+.env
+
+# Cache
+*.cache
+CLAUDE.md
+research.md
+.claude
+docs

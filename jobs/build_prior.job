@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=build_prior
+#SBATCH --output=logs/build_prior_%j.out
+#SBATCH --error=logs/build_prior_%j.err
+#SBATCH --time=03:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+# Partition set at submission: sbatch --partition=rome jobs/build_prior.job
+
+set -euo pipefail
+
+source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+
+mkdir -p "$HOME/NODIS/logs"
+mkdir -p "$HOME/NODIS/methodtotest/prior"
+
+echo "[$(date)] Starting prior construction pipeline"
+
+python "$HOME/NODIS/methodtotest/build_prior.py"
+
+echo "[$(date)] Done. Output in $HOME/NODIS/methodtotest/prior/"
+ls -lh "$HOME/NODIS/methodtotest/prior/"

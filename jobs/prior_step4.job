@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=prior_step4
+#SBATCH --output=logs/prior_step4_%j.out
+#SBATCH --error=logs/prior_step4_%j.err
+#SBATCH --time=00:15:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=32G
+
+set -euo pipefail
+source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+echo "[$(date)] Step 4: validate"
+python "$HOME/NODIS/methodtotest/build_prior.py" --step 4
+echo "[$(date)] Step 4 done"
+ls -lh "$HOME/NODIS/methodtotest/prior/"

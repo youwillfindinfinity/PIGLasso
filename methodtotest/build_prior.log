@@ -1,0 +1,9 @@
+
+=== Step 1: Extract gene list ===
+  Genes: 19923  |  Samples: 37
+  Sample genes: ['A1BG', 'A1BG-AS1', 'A1CF', 'A2M', 'A2MP1']
+  Saved: /home/rbumbuc/codes/Priority/Project NODIS/methodtotest/prior/genes.txt
+
+=== Step 2a: STRING PPI prior ===
+  Querying STRING in 20 batches of ≤1000 genes...
+  Batch 1/20 (1000 genes)... 

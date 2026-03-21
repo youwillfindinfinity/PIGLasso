@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=prior_step1
+#SBATCH --output=logs/prior_step1_%j.out
+#SBATCH --error=logs/prior_step1_%j.err
+#SBATCH --time=00:10:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+
+set -euo pipefail
+source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+mkdir -p "$HOME/NODIS/logs" "$HOME/NODIS/methodtotest/prior"
+echo "[$(date)] Step 1: extract genes"
+python "$HOME/NODIS/methodtotest/build_prior.py" --step 1
+echo "[$(date)] Step 1 done"

@@ -1,0 +1,2 @@
+ Read the updated CLAUDE.md and research.md, then revise docs/superpowers/plans/2026-03-19-burn-injury-thesis.md to reflect any changes in
+  scope, research questions, or methodology. Check memory for existing rules before starting.

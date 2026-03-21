@@ -1,0 +1,35 @@
+For creating the heatmap for the introduction figure. 
+
+On macOS:
+xcode-select --install
+brew install gcc
+
+tell R to use gfortran from /usr/local/bin before installing preprocessCore:
+mkdir -p ~/.R
+cat > ~/.R/Makevars <<'EOF'
+FC=/opt/homebrew/bin/gfortran
+F77=/opt/homebrew/bin/gfortran
+FLIBS=-L/opt/homebrew/lib/gcc/current -lgfortran -lquadmath -lm
+EOF
+
+
+First run in R:
+install.packages("BiocManager")
+
+# make sure Bioconductor matches your R (4.4 -> Bioc 3.20)
+BiocManager::install(version = "3.20")
+
+# now install preprocessCore
+BiocManager::install("preprocessCore")
+
+Then:
+install.packages("devtools")
+
+Then:
+devtools::install_github("Drinchai/BloodGen3Module")
+
+Then check if install succeeded:
+library(BloodGen3Module)
+
+Then also install:
+install.packages("data.table", repos = "https://cloud.r-project.org")

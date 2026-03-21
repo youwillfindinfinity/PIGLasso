@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name=prior_step2a
+#SBATCH --output=logs/prior_step2a_%j.out
+#SBATCH --error=logs/prior_step2a_%j.err
+#SBATCH --time=02:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=16G
+
+set -euo pipefail
+source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+echo "[$(date)] Step 2a: STRING PPI prior"
+python "$HOME/NODIS/methodtotest/build_prior.py" --step 2a
+echo "[$(date)] Step 2a done"

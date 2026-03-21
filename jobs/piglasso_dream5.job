@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=nodis_pig_dream5
+#SBATCH --output=logs/pig_dream5_%j.out
+#SBATCH --error=logs/pig_dream5_%j.err
+#SBATCH --time=20:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+# Partition is set at submission time: sbatch --partition=rome jobs/piglasso_dream5.job
+# 3 p-values × method piglasso = 3 tasks run in parallel.
+# --n-jobs 4 limits piglasso subsampling to 4 workers per task;
+# 3 tasks × 4 workers = 12 CPUs used simultaneously.
+
+[[ -f "$HOME/NODIS/snellius_modules.sh" ]] && source "$HOME/NODIS/snellius_modules.sh"
+source "$HOME/NODIS/.venv/bin/activate"
+
+mkdir -p "$HOME/NODIS/results/dream5" "$HOME/NODIS/logs"
+
+for P in 200 500 1000; do
+    python "$HOME/NODIS/benchmarks/run_dream5.py" \
+        --data-dir "$HOME/NODIS/data/dream5" \
+        --network  1                           \
+        --p        "$P"                        \
+        --method   piglasso                    \
+        --n-jobs   4                           \
+        --out      "$HOME/NODIS/results/dream5/" &
+done
+
+wait
