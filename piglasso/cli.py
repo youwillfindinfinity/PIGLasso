@@ -31,9 +31,9 @@ def main() -> None:
 @click.option("--data", required=True,
               help="Path to expression matrix TSV (genes × samples).")
 @click.option("--prior", default=None,
-              help="Path to prior matrix .npy file (optional). If omitted, runs unweighted.")
-@click.option("--Q", default=200, show_default=True,
-              help="Number of subsamples.")
+              help="Path to prior matrix .npy file (optional, reserved for future use).")
+@click.option("--n-subsamples", default=200, show_default=True,
+              help="Number of subsamples (Q).")
 @click.option("--b-perc", default=0.65, show_default=True,
               help="Subsample fraction of n.")
 @click.option("--lambda-lo", default=0.05, show_default=True,
@@ -49,7 +49,7 @@ def main() -> None:
 @click.option("--seed", default=42, show_default=True, help="Random seed.")
 @click.option("--out", default="results/piglasso/", show_default=True,
               help="Output directory.")
-def run(data, prior, q, b_perc, lambda_lo, lambda_hi, lambda_len,
+def run(data, prior, n_subsamples, b_perc, lambda_lo, lambda_hi, lambda_len,
         pi_thr, n_jobs, seed, out):
     """Run PIGLasso stability-selection inference on an expression matrix."""
     import numpy as np
@@ -63,13 +63,12 @@ def run(data, prior, q, b_perc, lambda_lo, lambda_hi, lambda_len,
     X = df.T.values.astype(float)
     click.echo(f"Loaded: {X.shape[0]} samples × {X.shape[1]} genes  ({data})")
 
-    prior_W = None
     if prior:
-        prior_W = np.load(prior)
-        click.echo(f"Prior loaded: {prior_W.shape}  ({prior})")
+        click.echo(f"NOTE: --prior provided ({prior}). Prior weighting is reserved for future use; "
+                   "running unweighted stability selection.", err=True)
 
     est = PIGLassoEstimator(
-        Q=q,
+        Q=n_subsamples,
         b_perc=b_perc,
         lambda_lo=lambda_lo,
         lambda_hi=lambda_hi,
@@ -77,8 +76,6 @@ def run(data, prior, q, b_perc, lambda_lo, lambda_hi, lambda_len,
         pi_thr=pi_thr,
         n_jobs=n_jobs,
         seed=seed,
-        lambda_wp=1.0 if prior_W is not None else 0.0,
-        W=prior_W,
     )
     est.fit(X)
     adj = est.get_adjacency()
@@ -127,59 +124,48 @@ def prior(step, pipeline_dir):
 # diffuse
 # ---------------------------------------------------------------------------
 
-@main.command()
-@click.option("--adjacency", required=True,
-              help="Path to adjacency matrix CSV (output of `piglasso run`).")
-@click.option("--delta", required=True,
-              help="Path to delta signal vector .npy or CSV.")
-@click.option("--out", default="results/diffusion/", show_default=True,
-              help="Output directory.")
-def diffuse(adjacency, delta, out):
-    """Run network diffusion signal propagation on a PIGLasso inferred network."""
-    import numpy as np
-    import pandas as pd
+@main.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def diffuse(args):
+    """Run network diffusion signal propagation (delegates to pipeline_src/diffusion/node_knockout.py).
 
-    out_dir = pathlib.Path(out)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    Pass arguments directly, e.g.:
 
-    adj = pd.read_csv(adjacency, index_col=0).values.astype(float)
-    delta_vec = (
-        np.load(delta) if delta.endswith(".npy")
-        else pd.read_csv(delta, header=None).values.ravel()
-    )
-
-    pipeline_dir = pathlib.Path(__file__).parent.parent / "pipeline_src"
-    sys.path.insert(0, str(pipeline_dir / "diffusion"))
-    from diffusion_signal import run_diffusion  # type: ignore[import]
-
-    result = run_diffusion(adj, delta_vec, out_dir=out_dir)
-    click.echo(f"Diffusion results → {out_dir}")
+    \b
+      piglasso diffuse --in_dir trauma_data/diffusion_inputs --out_dir results/diffusion
+      piglasso diffuse --help
+    """
+    import subprocess
+    script = pathlib.Path(__file__).parent.parent / "pipeline_src" / "diffusion" / "node_knockout.py"
+    if not script.exists():
+        click.echo(f"ERROR: {script} not found", err=True)
+        sys.exit(1)
+    result = subprocess.run([sys.executable, str(script)] + list(args))
+    sys.exit(result.returncode)
 
 
 # ---------------------------------------------------------------------------
 # knockout
 # ---------------------------------------------------------------------------
 
-@main.command()
-@click.option("--adjacency", required=True,
-              help="Path to adjacency matrix CSV.")
-@click.option("--out", default="results/knockouts/", show_default=True,
-              help="Output directory.")
-def knockout(adjacency, out):
-    """Run node-knockout robustness analysis on an inferred network."""
-    import pandas as pd
+@main.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def knockout(args):
+    """Run node-knockout robustness / diffusion signal analysis (delegates to pipeline_src/diffusion/node_knockout.py).
 
-    out_dir = pathlib.Path(out)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    Pass arguments directly, e.g.:
 
-    adj = pd.read_csv(adjacency, index_col=0)
-
-    pipeline_dir = pathlib.Path(__file__).parent.parent / "pipeline_src"
-    sys.path.insert(0, str(pipeline_dir / "knockouts"))
-    from node_knockout import run_knockouts  # type: ignore[import]
-
-    run_knockouts(adj, out_dir=out_dir)
-    click.echo(f"Knockout results → {out_dir}")
+    \b
+      piglasso knockout --in_dir trauma_data/diffusion_inputs --reduction 0.3
+      piglasso knockout --help
+    """
+    import subprocess
+    script = pathlib.Path(__file__).parent.parent / "pipeline_src" / "diffusion" / "node_knockout.py"
+    if not script.exists():
+        click.echo(f"ERROR: {script} not found", err=True)
+        sys.exit(1)
+    result = subprocess.run([sys.executable, str(script)] + list(args))
+    sys.exit(result.returncode)
 
 
 if __name__ == "__main__":
