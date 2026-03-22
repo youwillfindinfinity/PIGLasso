@@ -4,8 +4,8 @@
 #SBATCH --error=logs/pig_burns_%j.err
 #SBATCH --time=08:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=128G
 # Partition is set at submission time:
 #   sbatch --partition=rome jobs/piglasso_burns.job
 
@@ -36,17 +36,20 @@ python -c "import piglasso" 2>/dev/null || \
 cd "${PIGLASSO_DIR}"
 mkdir -p logs results/burns
 
-EXPR_TSV="${PIGLASSO_DIR}/data/burn/expression.tsv"
-PRIOR_NPY="${PIGLASSO_DIR}/pipeline_src/prior/prior_piglasso.npy"
+EXPR_TSV="${PIGLASSO_DIR}/data/burn/expression_top5000.tsv"
+# prior_burns_top5000.npy is a 5000×5000 subset of prior_piglasso.npy
+# matched to the top 5000 most variable genes in expression_top5000.tsv
+PRIOR_NPY="${PIGLASSO_DIR}/data/burn/prior_burns_top5000.npy"
 
 if [[ ! -f "${EXPR_TSV}" ]]; then
     echo "[ERROR] Burn expression TSV not found: ${EXPR_TSV}" >&2
-    echo "[ERROR] Run pipeline_src/preprocessing/burn/preprocess_burn.ipynb first." >&2
+    echo "[ERROR] Run: python3 scripts/filter_top_genes.py --n-genes 5000 --out-dir data/burn/" >&2
     exit 1
 fi
 
 if [[ ! -f "${PRIOR_NPY}" ]]; then
     echo "[ERROR] Prior matrix not found: ${PRIOR_NPY}" >&2
+    echo "[ERROR] Run: python3 scripts/filter_top_genes.py --n-genes 5000 --out-dir data/burn/" >&2
     exit 1
 fi
 
