@@ -13,3 +13,4 @@ data/
 results/
 .env
 *.npy
+.DS_Store
