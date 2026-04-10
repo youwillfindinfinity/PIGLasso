@@ -107,7 +107,13 @@ def _init_r_once() -> None:
 class QJSweeper:
     """
     Minimal QJ sweeper: subsample -> empirical cov -> glasso -> edge_counts.
-    Accepts an optional prior_matrix for compatibility, but does not use it.
+
+    When prior_matrix is supplied, a per-edge regularisation matrix is built:
+        rho_ij = lambda * (1 - prior_weight * prior_ij)
+    clipped to [0.1 * lambda, lambda], so prior-supported edges receive less
+    regularisation.  sklearn graphical_lasso (scalar alpha only) is bypassed
+    when a prior is active; R glasso (which accepts a rho matrix) is used
+    directly in that case.
     """
     def __init__(
         self,
@@ -115,6 +121,7 @@ class QJSweeper:
         b: int,
         Q: int,
         prior_matrix: np.ndarray | None = None,
+        prior_weight: float = 0.5,
         rank: int = 0,
         size: int = 1,
         seed: int = 42,
@@ -122,8 +129,21 @@ class QJSweeper:
     ):
         self.data = data
         self.prior_matrix = prior_matrix
+        self.prior_weight = float(prior_weight)
         self.p = int(data.shape[1])
         self.n = int(data.shape[0])
+
+        # Precompute lambda-independent penalty mask from prior (if given).
+        # rho_ij = lambda * _lambda1_mask[i,j]  at each lambda step.
+        if prior_matrix is not None:
+            pm = np.clip(prior_matrix, 0.0, 1.0).astype(float)
+            np.fill_diagonal(pm, 0.0)
+            pm = (pm + pm.T) / 2.0          # enforce symmetry
+            self._lambda1_mask: np.ndarray | None = np.clip(
+                1.0 - self.prior_weight * pm, 0.1, 1.0
+            )
+        else:
+            self._lambda1_mask = None
         self.Q = int(Q)
         self.n_jobs = int(n_jobs)
 
@@ -165,7 +185,38 @@ class QJSweeper:
 
         weighted_glasso = ro.globalenv["weighted_glasso"]
 
-        # Try sklearn first
+        # When a prior is active, build a per-edge rho matrix and go straight
+        # to R glasso (sklearn only accepts a scalar alpha).
+        if self._lambda1_mask is not None:
+            rho_matrix = float(lambdax) * self._lambda1_mask
+            try:
+                with localconverter(default_converter + numpy2ri.converter):
+                    # Pass S (covariance) and rho_matrix to R glasso.
+                    # R glasso accepts rho as either a scalar or a p×p matrix.
+                    res = weighted_glasso(S, rho_matrix, nobs)
+            except KeyboardInterrupt:
+                raise
+            except Exception as e:
+                print(f"[ERROR] glasso (prior) call failed: {e}", flush=True, file=sys.stderr)
+                return np.zeros((p, p), dtype=np.int8), 0
+
+            try:
+                res = dict(res)
+            except Exception:
+                res = {"precision_matrix": res[0]}
+
+            if "error_message" in res:
+                err = res["error_message"]
+                err_str = str(err[0]) if hasattr(err, "__len__") else str(err)
+                if err_str and err_str != "NULL":
+                    print(f"[R ERROR] {err_str}", flush=True, file=sys.stderr)
+                return np.zeros((p, p), dtype=np.int8), 0
+
+            precision = np.asarray(res["precision_matrix"], dtype=float)
+            edge_counts = (np.abs(precision) > 1e-5).astype(np.int8)
+            return edge_counts, 1
+
+        # No prior — try sklearn first (faster)
         try:
             from sklearn.covariance import graphical_lasso as sk_graphical_lasso
             with warnings.catch_warnings():
