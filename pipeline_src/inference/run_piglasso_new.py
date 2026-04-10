@@ -74,6 +74,19 @@ def load_group_tsv(path: Path) -> tuple[np.ndarray, list[str], list[str]]:
 # -----------------------------
 # core runner
 # -----------------------------
+def load_prior(prior_path: Path, p_genes: int) -> np.ndarray:
+    """Load and validate a prior matrix from a .npy file."""
+    prior = np.load(prior_path).astype(np.float32)
+    if prior.ndim != 2 or prior.shape[0] != prior.shape[1]:
+        raise ValueError(f"Prior must be a square 2-D array, got shape {prior.shape}")
+    if prior.shape[0] != p_genes:
+        raise ValueError(
+            f"Prior shape {prior.shape} does not match number of genes {p_genes}. "
+            "Ensure the prior was built from the same gene list."
+        )
+    return prior
+
+
 def run_one(in_path: Path, out_dir: Path, args) -> Path:
     print(f"[INFO] Loading data: {in_path}")
     data_array, gene_names, sample_names = load_group_tsv(in_path)
@@ -89,11 +102,28 @@ def run_one(in_path: Path, out_dir: Path, args) -> Path:
 
     lambda_range = np.linspace(args.llo, args.lhi, args.lamlen)
 
+    # Load prior if requested
+    prior_matrix = None
+    if args.prior is not None:
+        prior_path = Path(args.prior)
+        if not prior_path.exists():
+            raise FileNotFoundError(f"Prior file not found: {prior_path}")
+        prior_matrix = load_prior(prior_path, p_genes)
+        print(
+            f"[INFO] Prior loaded: {prior_path}  shape={prior_matrix.shape}  "
+            f"density={(prior_matrix > 0.05).sum() / 2 / (p_genes * (p_genes - 1) / 2):.4f}  "
+            f"prior_weight={args.prior_weight}"
+        )
+    else:
+        print("[INFO] No prior — running standard PIGLasso.")
+
     print("[DEBUG] building sweeper...")
     sweeper = QJSweeper(
         data=data_array,
         b=b,
         Q=args.Q,
+        prior_matrix=prior_matrix,
+        prior_weight=args.prior_weight,
         rank=0,
         size=1,
         seed=args.seed,
@@ -105,7 +135,12 @@ def run_one(in_path: Path, out_dir: Path, args) -> Path:
 
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = in_path.stem
-    out_base = f"{stem}__Q{args.Q}__bperc{args.b_perc}__lam{args.llo}-{args.lhi}x{args.lamlen}__seed{args.seed}"
+    prior_tag = f"__pw{args.prior_weight}" if prior_matrix is not None else ""
+    out_base = (
+        f"{stem}__Q{args.Q}__bperc{args.b_perc}"
+        f"__lam{args.llo}-{args.lhi}x{args.lamlen}"
+        f"__seed{args.seed}{prior_tag}"
+    )
     out_pkl = out_dir / f"{out_base}__piglasso_results.pkl"
 
     payload = {
@@ -125,6 +160,8 @@ def run_one(in_path: Path, out_dir: Path, args) -> Path:
         "lamlen": int(args.lamlen),
         "seed": int(args.seed),
         "mode": args.mode,
+        "prior_path": str(args.prior) if args.prior is not None else None,
+        "prior_weight": float(args.prior_weight),
     }
 
     with open(out_pkl, "wb") as f:
@@ -167,6 +204,22 @@ def main():
         type=int,
         default=1,
         help="Number of parallel jobs (1=sequential, -1=all CPUs, N=specific count)",
+    )
+    parser.add_argument(
+        "--prior",
+        default=None,
+        help=(
+            "Path to a .npy prior matrix (p×p, values in [0,1], symmetric, zero diagonal). "
+            "When supplied, per-edge regularisation is reduced for high-prior edges: "
+            "rho_ij = lambda * (1 - prior_weight * prior_ij). "
+            "Omit to run standard PIGLasso without a prior."
+        ),
+    )
+    parser.add_argument(
+        "--prior_weight",
+        type=float,
+        default=0.5,
+        help="Strength of prior influence (0 = no effect, 1 = maximum). Default: 0.5.",
     )
 
     parser.add_argument("--allow_install_glasso", action="store_true")

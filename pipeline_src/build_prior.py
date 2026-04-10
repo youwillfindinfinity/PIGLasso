@@ -26,7 +26,7 @@ from pathlib import Path
 # ---------- Paths ----------
 PIPELINE_DIR = Path(__file__).parent
 EXPR_PATH = PIPELINE_DIR / (
-    "BurnInjuries-main/BurnInjuries-main/preprocessing/"
+    "preprocessing/"
     "burn_control/preprocessed/GSE37069_controls__genes_x_samples.tsv"
 )
 OUT_DIR = PIPELINE_DIR / "prior"
