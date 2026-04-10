@@ -1,0 +1,48 @@
+All items from previous session completed (2026-03-21):
+- GSE236713 preprocessing script written: scripts/prepare_gse236713.py
+- Manuscript updated throughout: GSE37069 → GSE236713 (abstract, Dataset 2 section, prior
+  construction, diffusion baseline, data availability, acknowledgements)
+- SUBMISSION_CHECKLIST B-04 marked DONE (cross-platform issue resolved by platform match)
+
+HPC jobs running:
+- 21018716: nodis_diff_missing (diffusion glasso n513p164, 51 missing reps, 30 min)
+- 21018717: nodis_stars (stars benchmark, 600 tasks, 2 hr)
+
+Next remaining tasks:
+- Sync results back once HPC jobs complete (scripts/sync_results_back.sh)
+- Run analysis pipeline on GSE236713 data (download + scripts/prepare_gse236713.py)
+- Prior chain jobs 21017706–21017711 (check status — step2a was still running)
+
+---
+
+DESIGN DECISION (deferred to next session): Add a third wound-control dataset
+=============================================================================
+
+Context:
+  Current design uses GSE182616 (Agilent, burn) + GSE236713 (Agilent, healthy + SIRS).
+  Proposal: find a blood transcriptomics wound dataset (preferably Agilent GPL17077 or
+  compatible) with wound patients + healthy controls in the same study, then:
+    1. Use wound dataset for PIGLasso prior construction (replaces/supplements the
+       30-sample GSE236713 healthy prior — tighter correlations, more biological signal)
+    2. Compute burn-specific perturbation: δ_burn-specific = δ_burn − δ_wound
+       so diffusion identifies hubs genuinely distinctive to burn, not generic inflammation
+    3. Cross-dataset convergence of hub genes (burn ∩ wound) as partial validation (B-09)
+
+Checklist issues this would address:
+  - B-08: restores multi-dataset framing (collapsed when trauma dataset was removed)
+  - B-09: cross-dataset hub convergence = partial independent validation
+  - M-01: wound-derived prior has more samples → tighter SE, less noise than n=30 healthy
+
+Scoping constraint (important):
+  Use the wound dataset FOR PRIOR CONSTRUCTION ONLY if n is small (< 100).
+  Do not attempt full GGM inference on underpowered wound data.
+  Keep GSE236713 as the healthy baseline for δ (already platform-matched, already coded).
+
+GEO search to run at start of next session:
+  Query: ("blood" OR "whole blood" OR "PBMC") AND ("wound" OR "ulcer" OR "surgical")
+         AND "GPL17077"
+  If GPL17077 returns nothing: broaden to any Agilent human GE array (GPL6480, GPL4133,
+  GPL13497, GPL16699) — inter-Agilent effects are manageable but need probe overlap check.
+  Minimum bar: n ≥ 50 wound samples + matched healthy controls in same GEO series.
+
+Estimated additional work: 2–3 weeks (search + preprocess + prior rebuild + PIGLasso rerun).
