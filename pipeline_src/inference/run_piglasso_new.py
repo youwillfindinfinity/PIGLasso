@@ -74,17 +74,66 @@ def load_group_tsv(path: Path) -> tuple[np.ndarray, list[str], list[str]]:
 # -----------------------------
 # core runner
 # -----------------------------
-def load_prior(prior_path: Path, p_genes: int) -> np.ndarray:
-    """Load and validate a prior matrix from a .npy file."""
+def load_prior(prior_path: Path, gene_names: list[str]) -> np.ndarray:
+    """
+    Load a prior matrix and subset it to match gene_names.
+
+    The prior was built from a reference gene list (genes.txt).  If the
+    expression data contains a different or smaller set of genes, we load
+    that reference list and index into the prior accordingly.  Genes in
+    gene_names that are absent from the prior gene list receive a prior
+    column/row of zeros (no prior belief — equivalent to no prior for those
+    edges).
+    """
     prior = np.load(prior_path).astype(np.float32)
     if prior.ndim != 2 or prior.shape[0] != prior.shape[1]:
         raise ValueError(f"Prior must be a square 2-D array, got shape {prior.shape}")
-    if prior.shape[0] != p_genes:
-        raise ValueError(
-            f"Prior shape {prior.shape} does not match number of genes {p_genes}. "
-            "Ensure the prior was built from the same gene list."
+
+    p_genes = len(gene_names)
+
+    # Exact match — no subsetting needed
+    if prior.shape[0] == p_genes:
+        return prior
+
+    # Try to load the reference gene list that was used to build the prior
+    prior_genes_txt = prior_path.parent / "genes.txt"
+    if not prior_genes_txt.exists():
+        raise FileNotFoundError(
+            f"Prior shape {prior.shape} does not match number of genes {p_genes} "
+            f"and reference gene list not found at {prior_genes_txt}. "
+            "Rebuild the prior or supply genes.txt alongside the .npy file."
         )
-    return prior
+
+    prior_genes = prior_genes_txt.read_text().strip().split("\n")
+    prior_gene_idx = {g: i for i, g in enumerate(prior_genes)}
+
+    # Build index array: for each expression gene, find its position in prior
+    indices = [prior_gene_idx[g] for g in gene_names if g in prior_gene_idx]
+    found = [g for g in gene_names if g in prior_gene_idx]
+    missing = [g for g in gene_names if g not in prior_gene_idx]
+
+    if missing:
+        print(
+            f"[WARN] {len(missing)}/{p_genes} expression genes not found in prior "
+            f"gene list — those edges will have zero prior weight. "
+            f"Example missing: {missing[:5]}"
+        )
+
+    if not found:
+        print("[WARN] No expression genes found in prior gene list — prior has no effect.")
+        return np.zeros((p_genes, p_genes), dtype=np.float32)
+
+    # Subset prior to found genes, then expand to full p_genes x p_genes with zeros
+    sub = prior[np.ix_(indices, indices)]
+    full = np.zeros((p_genes, p_genes), dtype=np.float32)
+    found_positions = [i for i, g in enumerate(gene_names) if g in prior_gene_idx]
+    full[np.ix_(found_positions, found_positions)] = sub
+
+    print(
+        f"[INFO] Prior subsetted: {prior.shape[0]} → {p_genes} genes "
+        f"({len(found)} matched, {len(missing)} missing set to 0)"
+    )
+    return full
 
 
 def run_one(in_path: Path, out_dir: Path, args) -> Path:
@@ -108,7 +157,7 @@ def run_one(in_path: Path, out_dir: Path, args) -> Path:
         prior_path = Path(args.prior)
         if not prior_path.exists():
             raise FileNotFoundError(f"Prior file not found: {prior_path}")
-        prior_matrix = load_prior(prior_path, p_genes)
+        prior_matrix = load_prior(prior_path, gene_names)
         print(
             f"[INFO] Prior loaded: {prior_path}  shape={prior_matrix.shape}  "
             f"density={(prior_matrix > 0.05).sum() / 2 / (p_genes * (p_genes - 1) / 2):.4f}  "
