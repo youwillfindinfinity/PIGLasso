@@ -116,16 +116,27 @@ def estimate_lambda_np_fallback(edge_counts_all: np.ndarray, Q: int, lambda_rang
     return float(lambda_range[min(idx + 1, len(lambda_range) - 1)])
 
 
-def run_final_glasso(data: np.ndarray, lambdax: float) -> np.ndarray:
+def run_final_glasso(data: np.ndarray, lambdax: float,
+                     prior_matrix: np.ndarray | None = None,
+                     prior_weight: float = 0.5) -> np.ndarray:
     """
-    Run a final glasso on full dataset using penalty lambdax * 1 matrix.
+    Run a final glasso on full dataset.
+
+    Without prior: penalty = lambdax * ones(p, p)
+    With prior:    penalty[i,j] = lambdax * (1 - prior_weight * prior[i,j])
+                   matching the per-edge regularisation used in the subsampling.
     Returns precision matrix (p x p).
     """
     S = empirical_covariance(data)  # data is samples x genes
     nobs = data.shape[0]
     p = data.shape[1]
 
-    penalty = float(lambdax) * np.ones((p, p), dtype=float)
+    if prior_matrix is not None:
+        penalty = lambdax * (1.0 - prior_weight * prior_matrix.astype(float))
+        # clamp to avoid zero or negative penalties
+        penalty = np.clip(penalty, 1e-6, None)
+    else:
+        penalty = float(lambdax) * np.ones((p, p), dtype=float)
 
     weighted_glasso = ro.globalenv["weighted_glasso"]
     with localconverter(default_converter + numpy2ri.converter):
@@ -173,6 +184,25 @@ def main():
         help="Threshold on |precision| to call an edge in the final adjacency.",
     )
     parser.add_argument(
+        "--prior",
+        default=None,
+        help=(
+            "Path to a .npy prior matrix. "
+            "If omitted, the script auto-detects from the piglasso pkl "
+            "(prior_path key). Pass 'none' to explicitly disable the prior "
+            "even when the pkl records one."
+        ),
+    )
+    parser.add_argument(
+        "--prior_weight",
+        type=float,
+        default=None,
+        help=(
+            "Strength of prior influence (0–1). "
+            "If omitted, taken from the piglasso pkl (prior_weight key)."
+        ),
+    )
+    parser.add_argument(
         "--plot",
         action="store_true",
         help="Save an edge-curve plot (requires matplotlib).",
@@ -209,6 +239,46 @@ def main():
     samples = list(map(str, pig["samples"]))
     Q = int(pig["Q"])
     print(f"    > Loaded edge counts: {edge_counts_all.shape}, Q={Q}, λ range: [{lambda_range[0]:.3f}, {lambda_range[-1]:.3f}]")
+
+    # ── Resolve prior ────────────────────────────────────────────────────────
+    # With prior    → PIGLasso  (stability-based GGM with biological prior)
+    # Without prior → SSGLasso  (stability-based GGM, no prior)
+    #
+    # Priority: explicit --prior flag > pkl-recorded prior_path > no prior
+    prior_matrix = None
+    resolved_prior_weight = 0.5
+
+    explicit_prior = args.prior
+    if explicit_prior is not None and explicit_prior.lower() == "none":
+        explicit_prior = None  # user explicitly disabled
+        print("    > SSGLasso mode: prior DISABLED (--prior none)")
+    elif explicit_prior is not None:
+        prior_path = Path(explicit_prior)
+        if not prior_path.is_absolute():
+            prior_path = project_root / prior_path
+        if not prior_path.exists():
+            raise FileNotFoundError(f"Prior file not found: {prior_path}")
+        resolved_prior_weight = args.prior_weight if args.prior_weight is not None else 0.5
+        from run_piglasso_new import load_prior
+        prior_matrix = load_prior(prior_path, genes)
+        print(f"    > PIGLasso mode: prior from --prior flag  path={prior_path}  weight={resolved_prior_weight}")
+    elif pig.get("prior_path") is not None:
+        # Auto-detect: the pkl was produced by run_piglasso_new.py with a prior
+        prior_path = Path(pig["prior_path"])
+        if not prior_path.is_absolute():
+            prior_path = project_root / prior_path
+        if prior_path.exists():
+            resolved_prior_weight = (
+                args.prior_weight if args.prior_weight is not None
+                else float(pig.get("prior_weight", 0.5))
+            )
+            from run_piglasso_new import load_prior
+            prior_matrix = load_prior(prior_path, genes)
+            print(f"    > PIGLasso mode: prior auto-detected from pkl  path={prior_path}  weight={resolved_prior_weight}")
+        else:
+            print(f"    > SSGLasso mode: prior recorded in pkl but file missing ({prior_path}) — running without prior")
+    else:
+        print("    > SSGLasso mode: no prior in pkl")
 
     # expression path
     print(f"[4/7] Loading expression data...")
@@ -278,15 +348,17 @@ def main():
     else:
         lambda_np = estimate_lambda_np_fallback(sel_edge_counts_all, Q, sel_lambda_range)
 
-    # no prior for now
-    lambda_wp = 0.0
-    print(f"    > Selected λ_np = {lambda_np:.6f}")
+    lambda_wp = resolved_prior_weight if prior_matrix is not None else 0.0
+    model_name = "PIGLasso" if prior_matrix is not None else "SSGLasso"
+    print(f"    > Selected λ_np = {lambda_np:.6f}  (model: {model_name})")
 
     # -----------------------------
     # Final glasso -> precision -> adjacency
     # -----------------------------
-    print(f"[6/7] Running final graphical lasso (n={data.shape[0]}, p={data.shape[1]}, λ={lambda_np:.6f})...")
-    precision = run_final_glasso(data, lambda_np)
+    print(f"[6/7] Running final graphical lasso ({model_name}: n={data.shape[0]}, p={data.shape[1]}, λ={lambda_np:.6f})...")
+    precision = run_final_glasso(data, lambda_np,
+                                 prior_matrix=prior_matrix,
+                                 prior_weight=resolved_prior_weight)
     print(f"    > Precision matrix computed: {precision.shape}")
     print(f"    > Thresholding at {args.edge_threshold} to construct adjacency matrix...")
     adj = (np.abs(precision) > float(args.edge_threshold)).astype(int)
@@ -333,6 +405,9 @@ def main():
         },
         "lambda_np": float(lambda_np),
         "lambda_wp": float(lambda_wp),
+        "model": model_name,  # "PIGLasso" or "SSGLasso"
+        "prior_path": str(prior_path) if prior_matrix is not None else None,
+        "prior_weight": float(resolved_prior_weight) if prior_matrix is not None else None,
         "edge_threshold": float(args.edge_threshold),
         "precision_matrix": precision,
         "adjacency": adj,
@@ -349,10 +424,14 @@ def main():
     print(f"    > {out_genes_txt}")
 
     print("="*60)
-    print("✓ Network inference completed successfully!")
+    print(f"✓ Network inference completed successfully!  [{model_name}]")
     print(f"  Final network: {n_edges} edges, {len(genes)} genes")
     print(f"  Lambda: λ_np={lambda_np:.6f}, λ_wp={lambda_wp:.6f}")
     print(f"  Knees: left={left_knee_point:.4f}, main={main_knee_point:.4f}, right={right_knee_point:.4f}")
+    if prior_matrix is not None:
+        print(f"  Prior: {prior_path}  weight={resolved_prior_weight}")
+    else:
+        print("  Prior: none (SSGLasso)")
     print("="*60)
 
     if args.plot:

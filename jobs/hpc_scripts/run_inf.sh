@@ -18,50 +18,87 @@ module load R/4.4.2-gfbf-2024a
 
 source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
 
-INPUT_DIR="burn_results/piglasso_results"
-OUT_DIR="burn_results/network_inference"
+# ============================================================
+# CONFIG
+# ============================================================
+
+# Dataset: GSE182616 or GSE37069
+DATASET="GSE182616"
+
+# Prior toggle:
+#   "yes" -> PIGLasso: pass --prior and --prior_weight to network_inference.py
+#            (prior is also auto-detected from the pkl, but explicit is safer)
+#   "no"  -> SSGLasso: pass --prior none to force no-prior mode
+USE_PRIOR="yes"
+
+# Path to the prior matrix (.npy). Only used when USE_PRIOR="yes".
+PRIOR_PATH="PIGLasso/pipeline_src/prior/prior_piglasso.npy"
+
+# Prior strength in [0, 1].
+PRIOR_WEIGHT=0.5
+
+INPUT_DIR="inference/results/piglasso/${DATASET}"
+OUT_DIR="inference/results/network_inference/${DATASET}"
 mkdir -p "${OUT_DIR}"
 
+# ============================================================
+# Resolve prior args
+# ============================================================
+if [ "$USE_PRIOR" = "yes" ]; then
+  if [ ! -f "$PRIOR_PATH" ]; then
+    echo "[ERROR] Prior file not found: $PRIOR_PATH" >&2
+    exit 1
+  fi
+  PRIOR_ARGS="--prior $PRIOR_PATH --prior_weight $PRIOR_WEIGHT"
+  echo "[INFO] PIGLasso mode: prior ENABLED  path=$PRIOR_PATH  weight=$PRIOR_WEIGHT"
+else
+  PRIOR_ARGS="--prior none"
+  echo "[INFO] SSGLasso mode: prior DISABLED"
+fi
+
+# ============================================================
+# Find piglasso result pkls
+# ============================================================
 shopt -s nullglob
 FILES=( "${INPUT_DIR}"/*__piglasso_results.pkl )
-
-# Optional: stable sort
 IFS=$'\n' FILES=( $(printf "%s\n" "${FILES[@]}" | sort) )
 unset IFS
 
 if [ ${#FILES[@]} -eq 0 ]; then
-  echo "[ERROR] No *__piglasso_results.pkl files found in ${INPUT_DIR}"
+  echo "[ERROR] No *__piglasso_results.pkl files found in ${INPUT_DIR}" >&2
   exit 1
 fi
 
-echo "[INFO] Total files found: ${#FILES[@]}"
+echo "[INFO] Dataset:    ${DATASET}"
+echo "[INFO] Input dir:  ${INPUT_DIR}"
 echo "[INFO] Output dir: ${OUT_DIR}"
+echo "[INFO] Total files found: ${#FILES[@]}"
 echo
 
+# ============================================================
+# Run network inference for each pkl
+# ============================================================
 for ((i=0; i<${#FILES[@]}; i++)); do
   FPATH="${FILES[$i]}"
   FBASE="$(basename "$FPATH" .pkl)"
 
   echo "[INFO] ========================================"
-  echo "[INFO] File index: $i  (1-based: $((i+1))/${#FILES[@]})"
-  echo "[INFO] Input:  $FPATH"
-  echo "[INFO] Base:   $FBASE"
-  echo "[INFO] CPUs:   ${SLURM_CPUS_PER_TASK}"
+  echo "[INFO] File $((i+1))/${#FILES[@]}: $FBASE"
   echo "[INFO] ========================================"
 
   set -x
-  python3 monika/network_inference.py \
-    --piglasso_pkl "$FPATH" \
-    --out_dir "${OUT_DIR}" \
+  python3 PIGLasso/pipeline_src/inference/network_inference.py \
+    --piglasso_pkl   "$FPATH" \
+    --out_dir        "${OUT_DIR}" \
     --edge_threshold 1e-5 \
     --plot \
-    --allow_install_glasso
+    $PRIOR_ARGS
   set +x
 
-  echo "[INFO] Done. Matching outputs:"
   base="$(basename "${FPATH}" .pkl | sed 's/__piglasso_results$//')"
+  echo "[INFO] Outputs:"
   ls -lh "${OUT_DIR}/${base}__inferred"* 2>/dev/null || echo "[WARN] No outputs matched for ${base}"
   echo
 done
 
-echo "[INFO] All network inference jobs completed."
+echo "[INFO] All network inference jobs completed.  (model: $([ "$USE_PRIOR" = "yes" ] && echo PIGLasso || echo SSGLasso))"
