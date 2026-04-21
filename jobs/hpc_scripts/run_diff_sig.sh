@@ -28,9 +28,9 @@ DATASET="GSE182616"
 # Must match what was used in run_inf.sh
 MODEL="PIGLasso"
 
-# Per-patient trauma pseudobulk directory (10 files, one per patient)
+# Per-patient ctrl pseudobulk directory — GSE37069 control timepoint (10 files, one per patient)
 # diffusion_signal.py globs *__pseudobulk_genes_x_timepoint.tsv here
-TRAUMA_PB_DIR="$(pwd)/trauma_data/preprocessed"
+CTRL_PB_DIR="$(pwd)/preprocessing/burn_control/preprocessed"
 
 # ============================================================
 # Resolve inferred pkl path based on MODEL
@@ -62,8 +62,8 @@ if [ -z "${INFER_PKL:-}" ] || [ ! -f "$INFER_PKL" ]; then
   exit 1
 fi
 
-if [ ! -d "$TRAUMA_PB_DIR" ]; then
-  echo "[ERROR] Missing trauma pseudobulk dir: $TRAUMA_PB_DIR" >&2
+if [ ! -d "$CTRL_PB_DIR" ]; then
+  echo "[ERROR] Missing ctrl pseudobulk dir: $CTRL_PB_DIR" >&2
   exit 1
 fi
 
@@ -73,13 +73,13 @@ echo "============================================================" >&2
 echo "[INFO] Running diffusion_signal  (model: ${MODEL})" >&2
 echo "[INFO] dataset          : $DATASET" >&2
 echo "[INFO] inferred network : $INFER_PKL" >&2
-echo "[INFO] trauma pb dir    : $TRAUMA_PB_DIR" >&2
+echo "[INFO] ctrl pb dir      : $CTRL_PB_DIR" >&2
 echo "[INFO] output dir       : $OUT_DIR" >&2
 echo "============================================================" >&2
 
 python3 diffusion/diffusion_signal.py \
   --burn_inferred_pkl     "$INFER_PKL" \
-  --trauma_pseudobulk_dir "$TRAUMA_PB_DIR" \
+  --ctrl_pseudobulk_dir   "$CTRL_PB_DIR" \
   --ctrl_col              "$CTRL_COL" \
   --min_common_genes      "$MIN_COMMON_GENES" \
   --out_dir               "$OUT_DIR"
