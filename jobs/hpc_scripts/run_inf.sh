@@ -32,13 +32,13 @@ DATASET="GSE182616"
 USE_PRIOR="yes"
 
 # Path to the prior matrix (.npy). Only used when USE_PRIOR="yes".
-PRIOR_PATH="PIGLasso/pipeline_src/prior/prior_piglasso.npy"
+PRIOR_PATH="$(pwd)/PIGLasso/pipeline_src/prior/prior_piglasso.npy"
 
 # Prior strength in [0, 1].
 PRIOR_WEIGHT=0.5
 
-INPUT_DIR="inference/results/piglasso/${DATASET}"
-OUT_DIR="inference/results/network_inference/${DATASET}"
+INPUT_DIR="$(pwd)/PIGLasso/pipeline_src/inference/results/piglasso/${DATASET}"
+OUT_DIR="$(pwd)/PIGLasso/pipeline_src/inference/results/network_inference/${DATASET}"
 mkdir -p "${OUT_DIR}"
 
 # ============================================================
