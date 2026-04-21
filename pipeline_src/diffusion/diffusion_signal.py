@@ -223,7 +223,7 @@ def main():
     ctrl_ref.to_frame().to_csv(out_dir / "ctrl_reference.tsv", sep="\t")
     delta.to_frame().to_csv(out_dir / "delta.tsv", sep="\t")
 
-    ctrl_mat.to_csv(out_dir / "ctrl_per_patient_matrix.tsv", sep="\t")
+    ctrl_mat.to_csv(out_dir / "ctrl_matrix.tsv", sep="\t")
     Path(out_dir / "common_genes.txt").write_text("\n".join(genes) + "\n")
 
     adj_df = pd.DataFrame(adj, index=genes, columns=genes)

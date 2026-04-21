@@ -28,7 +28,7 @@ DATASET="GSE182616"
 # Must match what was used in run_inf.sh
 MODEL="PIGLasso"
 
-# Per-patient ctrl pseudobulk directory — GSE37069 control timepoint (10 files, one per patient)
+# GSE37069 ctrl pseudobulk directory — single file with one Ctrl column
 # diffusion_signal.py globs *__pseudobulk_genes_x_timepoint.tsv here
 CTRL_PB_DIR="$(pwd)/preprocessing/burn_control/preprocessed"
 
