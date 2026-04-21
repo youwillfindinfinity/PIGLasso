@@ -18,8 +18,14 @@ module load R/4.4.2-gfbf-2024a
 source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
 
 # ---------------- CONFIG ----------------
-IN_DIR="diffusion/results/GSE182616/diff_sig" # change to GSE37069 or GSE182616
-OUT_DIR="diffusion/results/GSE182616/net_diff" # change to GSE37069 or GSE182616
+# Dataset: GSE182616 or GSE37069
+DATASET="GSE182616"
+
+# Model: PIGLasso (with prior) or SSGLasso (no prior) — must match run_diff_sig.sh
+MODEL="PIGLasso"
+
+IN_DIR="$(pwd)/PIGLasso/pipeline_src/diffusion/results/${DATASET}/${MODEL}/diff_sig"
+OUT_DIR="$(pwd)/PIGLasso/pipeline_src/diffusion/results/${DATASET}/${MODEL}/net_diff"
 
 ADJ_NAME="burn_network_adjacency.csv"
 DELTA_NAME="delta.tsv"
@@ -68,7 +74,7 @@ echo "[INFO] in_dir  : $IN_DIR" >&2
 echo "[INFO] out_dir : $OUT_DIR" >&2
 echo "============================================================" >&2
 
-python3 diffusion/network_diffusion.py \
+python3 PIGLasso/pipeline_src/diffusion/network_diffusion.py \
   --in_dir "$IN_DIR" \
   --adj "$ADJ_NAME" \
   --delta "$DELTA_NAME" \
