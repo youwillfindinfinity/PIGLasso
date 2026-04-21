@@ -77,7 +77,7 @@ echo "[INFO] ctrl pb dir      : $CTRL_PB_DIR" >&2
 echo "[INFO] output dir       : $OUT_DIR" >&2
 echo "============================================================" >&2
 
-python3 diffusion/diffusion_signal.py \
+python3 PIGLasso/pipeline_src/diffusion/diffusion_signal.py \
   --burn_inferred_pkl     "$INFER_PKL" \
   --ctrl_pseudobulk_dir   "$CTRL_PB_DIR" \
   --ctrl_col              "$CTRL_COL" \
