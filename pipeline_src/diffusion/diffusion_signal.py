@@ -49,7 +49,7 @@ def load_burn_expr(expr_tsv: Path, genes_in_network: List[str]) -> Tuple[pd.Data
     return X_aligned, burn_state
 
 
-def load_trauma_pseudobulk(pseudobulk_paths: List[Path]) -> Dict[str, pd.DataFrame]:
+def load_ctrl_pseudobulk(pseudobulk_paths: List[Path]) -> Dict[str, pd.DataFrame]:
     """
     Each file: genes x timepoints (Ctrl, 4h, 24h, 72h, ...)
     Returns dict: patient_id -> DataFrame(genes x timepoints)
@@ -72,8 +72,8 @@ def load_trauma_pseudobulk(pseudobulk_paths: List[Path]) -> Dict[str, pd.DataFra
     return out
 
 
-def build_trauma_ctrl_reference_common(
-    trauma_pb: Dict[str, pd.DataFrame],
+def build_ctrl_reference(
+    ctrl_pb: Dict[str, pd.DataFrame],
     genes_in_network: List[str],
     ctrl_col: str = "Ctrl",
     min_patients: int = 1,
@@ -84,13 +84,13 @@ def build_trauma_ctrl_reference_common(
     across all included patients. Does NOT expand to full network size.
 
     Returns:
-      trauma_ctrl_mean_common: Series indexed by common_genes
-      trauma_ctrl_mat: DataFrame indexed by common_genes, cols=patients
+      ctrl_mean: Series indexed by common_genes
+      ctrl_mat: DataFrame indexed by common_genes, cols=patients
       common_genes: list of genes (ordered as in genes_in_network)
     """
     ctrl_vectors: Dict[str, pd.Series] = {}
 
-    for patient, df in trauma_pb.items():
+    for patient, df in ctrl_pb.items():
         if ctrl_col not in df.columns:
             continue
 
@@ -104,7 +104,7 @@ def build_trauma_ctrl_reference_common(
 
     if len(ctrl_vectors) < min_patients:
         raise RuntimeError(
-            f"Found Ctrl in only {len(ctrl_vectors)} trauma patient files "
+            f"Found Ctrl in only {len(ctrl_vectors)} ctrl patient files "
             f"(min required={min_patients}). Check your pseudobulk columns."
         )
 
@@ -122,11 +122,11 @@ def build_trauma_ctrl_reference_common(
             f"Try using more consistent preprocessing or fewer patients for now."
         )
 
-    trauma_ctrl_mat = pd.DataFrame({pat: ctrl_vectors[pat].loc[common_genes] for pat in ctrl_vectors})
-    trauma_ctrl_mean = trauma_ctrl_mat.mean(axis=1)
-    trauma_ctrl_mean.name = "trauma_ctrl_reference"
+    ctrl_mat = pd.DataFrame({pat: ctrl_vectors[pat].loc[common_genes] for pat in ctrl_vectors})
+    ctrl_mean = ctrl_mat.mean(axis=1)
+    ctrl_mean.name = "ctrl_reference"
 
-    return trauma_ctrl_mean, trauma_ctrl_mat, common_genes
+    return ctrl_mean, ctrl_mat, common_genes
 
 
 def subset_adjacency(adj: np.ndarray, genes: List[str], keep_genes: List[str]) -> Tuple[np.ndarray, List[str]]:
@@ -150,11 +150,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--burn_inferred_pkl", required=True)
     ap.add_argument("--burn_expr_tsv", default=None)
-    ap.add_argument("--trauma_pseudobulk_dir", required=True)
+    ap.add_argument("--ctrl_pseudobulk_dir", required=True)
     ap.add_argument("--ctrl_col", default="Ctrl")
     ap.add_argument("--min_patients", type=int, default=1)
     ap.add_argument("--min_common_genes", type=int, default=50)
-    ap.add_argument("--out_dir", default="trauma_data/diffusion_inputs")
+    ap.add_argument("--out_dir", default="ctrl_data/diffusion_inputs")
     ap.add_argument("--project_root", default=None)
     args = ap.parse_args()
 
@@ -180,22 +180,22 @@ def main():
 
     burn_X_full, burn_state_full = load_burn_expr(burn_expr_tsv, genes_full)
 
-    # Trauma pseudobulk
-    trauma_dir = Path(args.trauma_pseudobulk_dir)
-    if not trauma_dir.is_absolute():
-        trauma_dir = project_root / trauma_dir
-    if not trauma_dir.exists():
-        raise FileNotFoundError(f"Missing trauma dir: {trauma_dir}")
+    # GSE37069 ctrl pseudobulk
+    ctrl_dir = Path(args.ctrl_pseudobulk_dir)
+    if not ctrl_dir.is_absolute():
+        ctrl_dir = project_root / ctrl_dir
+    if not ctrl_dir.exists():
+        raise FileNotFoundError(f"Missing ctrl dir: {ctrl_dir}")
 
-    trauma_files = sorted(trauma_dir.glob("*__pseudobulk_genes_x_timepoint.tsv"))
-    if not trauma_files:
-        raise FileNotFoundError(f"No pseudobulk TSV files found in: {trauma_dir}")
+    ctrl_files = sorted(ctrl_dir.glob("*__pseudobulk_genes_x_timepoint.tsv"))
+    if not ctrl_files:
+        raise FileNotFoundError(f"No pseudobulk TSV files found in: {ctrl_dir}")
 
-    trauma_pb = load_trauma_pseudobulk(trauma_files)
+    ctrl_pb = load_ctrl_pseudobulk(ctrl_files)
 
     # build reference ONLY on common genes 
-    trauma_ref, trauma_ctrl_mat, common_genes = build_trauma_ctrl_reference_common(
-        trauma_pb=trauma_pb,
+    ctrl_ref, ctrl_mat, common_genes = build_ctrl_reference(
+        ctrl_pb=ctrl_pb,
         genes_in_network=genes_full,
         ctrl_col=args.ctrl_col,
         min_patients=args.min_patients,
@@ -207,8 +207,8 @@ def main():
     burn_state.name = "burn_state"
 
     # Delta only on common genes
-    delta = (burn_state - trauma_ref).astype(float)
-    delta.name = "delta_burn_minus_trauma_ctrl"
+    delta = (burn_state - ctrl_ref).astype(float)
+    delta.name = "delta_burn_minus_ctrl"
 
     # Restrict network to induced subgraph on common genes
     adj, genes = subset_adjacency(adj_full, genes_full, common_genes)
@@ -220,10 +220,10 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     burn_state.to_frame().to_csv(out_dir / "burn_state.tsv", sep="\t")
-    trauma_ref.to_frame().to_csv(out_dir / "trauma_ctrl_reference.tsv", sep="\t")
+    ctrl_ref.to_frame().to_csv(out_dir / "ctrl_reference.tsv", sep="\t")
     delta.to_frame().to_csv(out_dir / "delta.tsv", sep="\t")
 
-    trauma_ctrl_mat.to_csv(out_dir / "trauma_ctrl_per_patient_matrix.tsv", sep="\t")
+    ctrl_mat.to_csv(out_dir / "ctrl_per_patient_matrix.tsv", sep="\t")
     Path(out_dir / "common_genes.txt").write_text("\n".join(genes) + "\n")
 
     adj_df = pd.DataFrame(adj, index=genes, columns=genes)
@@ -235,12 +235,12 @@ def main():
     meta = {
         "burn_inferred_pkl": str(inferred_pkl),
         "burn_expr_tsv": str(burn_expr_tsv),
-        "trauma_pseudobulk_dir": str(trauma_dir),
+        "ctrl_pseudobulk_dir": str(ctrl_dir),
         "n_network_genes_full": len(genes_full),
         "n_network_genes_common": len(genes),
         "n_burn_samples": int(burn_X_full.shape[1]),
-        "n_trauma_files_found": len(trauma_files),
-        "n_trauma_patients_with_ctrl_used": int(trauma_ctrl_mat.shape[1]),
+        "n_ctrl_files_found": len(ctrl_files),
+        "n_ctrl_patients_used": int(ctrl_mat.shape[1]),
         "ctrl_col": args.ctrl_col,
         "min_patients": int(args.min_patients),
         "min_common_genes": int(args.min_common_genes),
@@ -252,9 +252,9 @@ def main():
     print(f"  network genes (full): {len(genes_full)}")
     print(f"  network genes (common): {len(genes)}")
     print(f"  burn samples: {burn_X_full.shape[1]}")
-    print(f"  trauma files found: {len(trauma_files)}")
-    print(f"  trauma patients used (Ctrl): {trauma_ctrl_mat.shape[1]}")
-    print("  saved: delta.tsv, burn_state.tsv, trauma_ctrl_reference.tsv, common_genes.txt, induced network")
+    print(f"  ctrl files found: {len(ctrl_files)}")
+    print(f"  ctrl patients used: {ctrl_mat.shape[1]}")
+    print("  saved: delta.tsv, burn_state.tsv, ctrl_reference.tsv, common_genes.txt, induced network")
 
 
 if __name__ == "__main__":
