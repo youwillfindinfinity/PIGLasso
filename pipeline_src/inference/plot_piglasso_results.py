@@ -46,9 +46,8 @@ matplotlib.rcParams.update({
 # Paths
 # ---------------------------------------------------------------------------
 _HERE        = os.path.dirname(os.path.abspath(__file__))
-PIGLASSO_DIR = os.path.join(_HERE, "..", "..", "..", "..", "inference",
-                             "results", "piglasso", "GSE182616")
-FIGURES_DIR  = os.path.join(_HERE, "figures")
+PIGLASSO_DIR = os.path.join(_HERE, "results", "piglasso", "GSE182616")
+FIGURES_DIR  = os.path.join(_HERE, "results", "figures")
 
 PKL_PRIOR   = os.path.join(
     PIGLASSO_DIR,
@@ -71,7 +70,7 @@ NETWORK_STAB_THRESH = 1.0
 # ---------------------------------------------------------------------------
 BIO_CATEGORIES = {
     "immune": {
-        "color": "#E8527A",  # rose-red
+        "color": "#CC4778",  # pink
         "genes": {
             "IL10", "EMR3", "CD86", "KLRD1", "KIR2DL2", "KIR3DL1",
             "TREM1", "TIGIT", "PRF1", "MERTK", "PLA2G7", "FCRL1",
@@ -79,7 +78,7 @@ BIO_CATEGORIES = {
         },
     },
     "signalling": {
-        "color": "#9B59B6",  # purple
+        "color": "#4C81D9",  # blue
         "genes": {
             "IKBKB", "RAF1", "RPS6KA5", "PPP1R12B", "PPP1R15A",
             "STAT5A", "SOCS3", "TRIB1", "DUSP2", "PIM3", "HIF1A",
@@ -87,21 +86,21 @@ BIO_CATEGORIES = {
         },
     },
     "apoptosis": {
-        "color": "#FF8C42",  # orange
+        "color": "#F78154",  # orange
         "genes": {
             "BTG1", "BTG2", "CABLES2", "DNAJB1", "FOSB", "CREM",
             "SERTAD2", "NR4A2", "CASC2", "TNFRSF10D",
         },
     },
     "metabolism": {
-        "color": "#F39C12",  # amber
+        "color": "#F2C14E",  # yellow
         "genes": {
             "ABCG1", "ACSL3", "GCLM", "GRAMD1C", "L2HGDH", "TKTL1",
             "SLC1A3", "SLC45A4", "VNN3", "HAL", "ADPRH",
         },
     },
     "epigenetic": {
-        "color": "#1ABC9C",  # teal
+        "color": "#59CC47",  # green
         "genes": {
             "JARID2", "NCOA2", "PCGF3", "PHF13", "UBN1", "AUTS2",
             "PRDM8", "TOX4", "HMBOX1", "AKNA",
@@ -119,7 +118,7 @@ def _gene_color(gene: str) -> str:
     for cat in BIO_CATEGORIES.values():
         if gene in cat["genes"]:
             return cat["color"]
-    return "#B0C4DE"  # light steel blue — uncharacterised
+    return "#5BC9C4"  # light blue — uncharacterised
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +159,7 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     s_noprior = _stability_matrix(d_noprior)
 
     thresholds = [0.5, 0.8, 1.0]
-    thr_colors = {0.5: "#B4436C", 0.8: "#4D9078", 1.0: "#F78154"}
+    thr_colors = {0.5: "#B4436C", 0.8: "#5CAD6E", 1.0: "#F78154"}
 
     counts_prior   = _edge_counts_per_lambda(s_prior,   thresholds)
     counts_noprior = _edge_counts_per_lambda(s_noprior, thresholds)
@@ -175,7 +174,7 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
         ax.plot(lam, counts_noprior[t], color=c, lw=1.4,  ls="--", label=f"{label_np}")
 
     # Vertical line at chosen network lambda
-    ax.axvline(NETWORK_LAMBDA, color="#3d7eaa", lw=1.0, ls=":", alpha=0.8,
+    ax.axvline(NETWORK_LAMBDA, color="#4C72B0", lw=1.0, ls=":", alpha=0.8,
                label=f"network λ = {NETWORK_LAMBDA}")
 
     ax.set_xlabel("Regularisation parameter λ", fontsize=10)
@@ -271,7 +270,7 @@ def plot_network(out_stem: str, dpi: int = 200):
 
     pos          = _compute_layout(genes, degree)
     node_colors  = [_gene_color(g) for g in genes]
-    node_sizes   = [18 + d ** 1.65 for d in degree]
+    node_sizes   = [60 + d ** 1.85 for d in degree]
     mu, sd       = degree.mean(), degree.std()
     thr_hub      = mu + 2 * sd
     thr_high     = mu + sd
@@ -340,25 +339,25 @@ def plot_network(out_stem: str, dpi: int = 200):
         for name, cat in BIO_CATEGORIES.items()
     ]
     handles.append(
-        mpatches.Patch(facecolor="#B0C4DE", edgecolor="none",
-                       label="Uncharacterised")
+        mpatches.Patch(facecolor="#5BC9C4", edgecolor="white",
+                       linewidth=0.5, label="Uncharacterised")
     )
-    leg = ax.legend(handles=handles, loc="lower left", fontsize=7.5,
+    leg = ax.legend(handles=handles, loc="lower left", fontsize=12,
                     frameon=True, framealpha=0.25, edgecolor="#555555",
                     facecolor="#111122", labelcolor="white",
-                    handlelength=1.0, labelspacing=0.4, title="Category",
-                    title_fontsize=8)
+                    handlelength=1.6, handleheight=1.4, labelspacing=0.7,
+                    title="Category", title_fontsize=13)
     leg.get_title().set_color("white")
 
     # --- Node size legend ---
     deg_examples = [(5, "deg = 5"), (15, "deg = 15"), (30, "deg = 30 (hub)")]
     for dex, lbl in deg_examples:
-        ax.scatter([], [], s=18 + dex ** 1.65, c="white", alpha=0.7, label=lbl)
-    size_leg = ax.legend(loc="lower right", fontsize=7, frameon=True,
+        ax.scatter([], [], s=60 + dex ** 1.85, c="white", alpha=0.7, label=lbl)
+    size_leg = ax.legend(loc="lower right", fontsize=11, frameon=True,
                          framealpha=0.25, edgecolor="#555555",
                          facecolor="#111122", labelcolor="white",
-                         title="Node size", title_fontsize=8,
-                         scatterpoints=1, labelspacing=0.6)
+                         title="Node size", title_fontsize=12,
+                         scatterpoints=1, labelspacing=0.8)
     size_leg.get_title().set_color("white")
     ax.add_artist(leg)
 
@@ -373,8 +372,8 @@ def plot_network(out_stem: str, dpi: int = 200):
             f"Prior weight: 0.5  ·  Q = 200 subsamples"
         ),
         transform=ax.transAxes, va="top", ha="left",
-        fontsize=7, color="#aaaaaa",
-        bbox=dict(boxstyle="round,pad=0.4", fc="#111122",
+        fontsize=13, color="#aaaaaa",
+        bbox=dict(boxstyle="round,pad=0.6", fc="#111122",
                   ec="#444444", alpha=0.8),
     )
 
@@ -382,7 +381,7 @@ def plot_network(out_stem: str, dpi: int = 200):
     ax.set_title(
         "PIGLasso Co-expression Network  ·  GSE182616 (Acute Phase)\n"
         f"Stability-based GGM with prior  ·  Stability = 1.0  ·  λ = {lam_val:.2f}  ·  n/p = 3.13",
-        color="white", pad=10, fontsize=10.5, fontweight="bold",
+        color="white", pad=10, fontsize=13.5, fontweight="bold",
     )
 
     fig.tight_layout()

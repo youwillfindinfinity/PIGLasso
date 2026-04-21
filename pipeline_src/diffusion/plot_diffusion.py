@@ -46,8 +46,8 @@ TOP_N         = 20   # genes shown in bar chart
 HEATMAP_N     = 30   # genes shown in heatmap
 HEATMAP_T_MAX = 40   # number of time columns to show (early dynamics are most informative)
 
-POS_COLOR = "#E8527A"   # rose-red  — upregulated in burn
-NEG_COLOR = "#4D9078"   # teal      — downregulated in burn
+POS_COLOR = "#B4436C"   # pink   — upregulated in burn
+NEG_COLOR = "#4D9078"   # green  — downregulated in burn
 
 
 # ---------------------------------------------------------------------------
@@ -107,13 +107,11 @@ def plot_delta_bar(delta: pd.Series, out_stem: str, dataset: str,
     ax.legend(handles=legend_handles, fontsize=8, frameon=True,
               framealpha=0.9, edgecolor="#cccccc", loc="lower right")
 
-    ax.set_title(f"Top {TOP_N} differentially expressed genes", fontsize=12,
-                 fontweight="bold", pad=4)
-    ax.text(0.5, 1.01,
-            f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
-            f"Δ = burn mean − GSE37069 ctrl",
-            transform=ax.transAxes, ha="center", va="bottom",
-            fontsize=8, color="black")
+    fig.suptitle(f"Top {TOP_N} differentially expressed genes", fontsize=12,
+                 fontweight="bold", y=0.995)
+    ax.set_title(f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
+                 f"Δ = burn mean − GSE37069 ctrl",
+                 fontsize=8, color="black", pad=2)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
@@ -161,13 +159,11 @@ def plot_diffusion_heatmap(delta: pd.Series, diff: pd.DataFrame,
     cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
     cbar.set_label("Diffused signal", fontsize=9)
 
-    ax.set_title("Network diffusion signal over time", fontsize=12,
-                 fontweight="bold", pad=4)
-    ax.text(0.5, 1.01,
-            f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
-            f"top {HEATMAP_N} genes by |Δ|  ·  t ∈ [0, {t_vals[n_cols-1]:.2f}]",
-            transform=ax.transAxes, ha="center", va="bottom",
-            fontsize=8, color="black")
+    fig.suptitle("Network diffusion signal over time", fontsize=12,
+                 fontweight="bold", y=0.995)
+    ax.set_title(f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
+                 f"top {HEATMAP_N} genes by |Δ|  ·  t ∈ [0, {t_vals[n_cols-1]:.2f}]",
+                 fontsize=8, color="black", pad=2)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):

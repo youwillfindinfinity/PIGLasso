@@ -49,45 +49,50 @@ REDUCTION  = 0.1   # must match the reduction used in run_knockout.sh
 
 BIO_CATEGORIES = {
     "immune": {
-        "color": "#E8527A",
+        "color": "#B4436C",
         "genes": {
             "IL10", "EMR3", "CD86", "KLRD1", "KIR2DL2", "KIR3DL1",
             "TREM1", "TIGIT", "PRF1", "MERTK", "PLA2G7", "FCRL1",
             "S1PR5", "FASLG", "TNFRSF10D", "PIK3R5", "TRPV2",
+            "AREG",
         },
     },
     "signalling": {
-        "color": "#9B59B6",
+        "color": "#4C72B0",
         "genes": {
             "IKBKB", "RAF1", "RPS6KA5", "PPP1R12B", "PPP1R15A",
             "STAT5A", "SOCS3", "TRIB1", "DUSP2", "PIM3", "HIF1A",
             "PIK3IP1", "RAPGEF2", "RGL1", "IRS2", "MARCKS",
+            "IGF2R",
         },
     },
     "apoptosis": {
-        "color": "#FF8C42",
+        "color": "#F78154",
         "genes": {
             "BTG1", "BTG2", "CABLES2", "DNAJB1", "FOSB", "CREM",
             "SERTAD2", "NR4A2", "CASC2", "TNFRSF10D",
+            "RELL1", "KIAA0087",
         },
     },
     "metabolism": {
-        "color": "#F39C12",
+        "color": "#F2C14E",
         "genes": {
             "ABCG1", "ACSL3", "GCLM", "GRAMD1C", "L2HGDH", "TKTL1",
             "SLC1A3", "SLC45A4", "VNN3", "HAL", "ADPRH",
+            "CHSY1",
         },
     },
     "epigenetic": {
-        "color": "#1ABC9C",
+        "color": "#5CAD6E",
         "genes": {
             "JARID2", "NCOA2", "PCGF3", "PHF13", "UBN1", "AUTS2",
             "PRDM8", "TOX4", "HMBOX1", "AKNA",
+            "ZNF254",
         },
     },
 }
 
-UNCHARACTERISED_COLOR = "#B0C4DE"
+UNCHARACTERISED_COLOR = "#264653"
 
 
 def _gene_color(gene: str) -> str:
@@ -150,13 +155,11 @@ def plot_knockout_bar(ko: pd.DataFrame, out_stem: str, dataset: str,
               framealpha=0.9, edgecolor="#cccccc", loc="lower right",
               labelspacing=0.4)
 
-    ax.set_title(f"Top {TOP_N} genes by knockout impact", fontsize=12,
-                 fontweight="bold", pad=4)
-    ax.text(0.5, 1.01,
-            f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
-            f"reduction = {REDUCTION}",
-            transform=ax.transAxes, ha="center", va="bottom",
-            fontsize=8, color="black")
+    fig.suptitle(f"Top {TOP_N} genes by knockout impact", fontsize=12,
+                 fontweight="bold", y=0.995)
+    ax.set_title(f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
+                 f"reduction = {REDUCTION}",
+                 fontsize=8, color="black", pad=2)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
@@ -219,12 +222,10 @@ def plot_delta_vs_knockout(ko: pd.DataFrame, delta: pd.Series,
               framealpha=0.9, edgecolor="#cccccc",
               loc="upper left", labelspacing=0.4)
 
-    ax.set_title("|Δ expression| vs knockout impact", fontsize=12,
-                 fontweight="bold", pad=4)
-    ax.text(0.5, 1.01,
-            f"{dataset}  ·  acute phase  ·  model = {model}",
-            transform=ax.transAxes, ha="center", va="bottom",
-            fontsize=8, color="black")
+    fig.suptitle("|Δ expression| vs knockout impact", fontsize=12,
+                 fontweight="bold", y=0.995)
+    ax.set_title(f"{dataset}  ·  acute phase  ·  model = {model}",
+                 fontsize=8, color="black", pad=2)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
