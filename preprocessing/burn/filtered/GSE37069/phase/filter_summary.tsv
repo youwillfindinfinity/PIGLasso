@@ -1,0 +1,4 @@
+group	n_samples	n_samples_adult	genes_before	genes_after_mean_filter	did_mv	genes_after_mv_adjust	phase
+PHASE__Acute__n239__zscored	239	130	19923	1993	True	40	Acute
+PHASE__Proliferation__n32__zscored	32	23	19923	1993	True	40	Proliferation
+PHASE__Remodelling__n282__zscored	282	176	19923	1993	True	40	Remodelling

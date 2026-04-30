@@ -279,8 +279,8 @@ def main():
 
     # Mode-specific dirs
     if args.mode == "burn":
-        in_dir = project_root / "preprocessing" / "burn" / "filtered" / "GSE37069" / "phase" #change this to GSE37069 or GSE182616
-        out_dir = project_root / "inference" / "results" / "piglasso" / "GSE37069" #change this to GSE37069 or GSE182616
+        in_dir = project_root / "preprocessing" / "burn" / "filtered" / "GSE182616" / "phase" #change this to GSE37069 or GSE182616
+        out_dir = project_root / "inference" / "results" / "piglasso" / "GSE182616" #change this to GSE37069 or GSE182616
     else:
         in_dir = project_root / "benchmarking" / "data" / "SGG" / "160" # change to dream, GRN or SGG. if dream or GRN > add: / "preprocessed"
         out_dir = project_root / "benchmarking" / "results" / "piglasso" / "SGG" / "160" # change to dream, GRN or SGG.

@@ -54,7 +54,7 @@ FILES=()
 
 if [ "$MODE" = "burn" ]; then
   FILES=(
-    "/gpfs/home2/zblei/Documents/BurnInjuries/preprocessing/burn/filtered/GSE182616/phase/PHASE__Acute__n513__zscored__filtered.tsv"
+    "preprocessing/burn/filtered/GSE182616/phase/PHASE__Acute__n513__zscored__filtered.tsv"
   )
 
 elif [ "$MODE" = "bench" ]; then
