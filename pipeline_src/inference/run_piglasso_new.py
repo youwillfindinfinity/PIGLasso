@@ -275,7 +275,7 @@ def main():
 
     args = parser.parse_args()
 
-    project_root = Path(__file__).resolve().parents[2]  # PIGLasso/
+    project_root = Path(__file__).resolve().parents[1]  # PIGLasso/pipeline_src/
 
     # Mode-specific dirs
     if args.mode == "burn":
