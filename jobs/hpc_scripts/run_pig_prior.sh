@@ -9,14 +9,14 @@
 
 set -euo pipefail
 
-cd /gpfs/home2/zblei/Documents/BurnInjuries
+cd /gpfs/home2/zblei/Documents/BurnInjuries/PIGLasso
 mkdir -p logs
 
 module purge
 module load 2024
 module load R/4.4.2-gfbf-2024a
 
-source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
+source /gpfs/home2/zblei/Documents/BurnInjuries/NODIS/.venv/bin/activate
 
 # ============================================================
 # CONFIG
@@ -34,7 +34,7 @@ USE_PRIOR="yes"
 
 # Path to the prior matrix (.npy).  Only used when USE_PRIOR="yes".
 # Built by: python pipeline_src/build_prior.py --step 1..4
-PRIOR_PATH="pipeline_src/prior/prior_piglasso.npy"
+PRIOR_PATH="pipeline_src/prior/prior_piglasso.npy"  # relative to PIGLasso/
 
 # Prior strength in [0, 1].  0 = no effect, 1 = maximum reduction.
 PRIOR_WEIGHT=0.5
@@ -54,7 +54,7 @@ FILES=()
 
 if [ "$MODE" = "burn" ]; then
   FILES=(
-    "preprocessing/burn/filtered/GSE37069/phase/PHASE__Acute__n239__zscored__adult18plus__filtered.tsv"
+    "/gpfs/home2/zblei/Documents/BurnInjuries/preprocessing/burn/filtered/GSE182616/phase/PHASE__Acute__n513__zscored__filtered.tsv"
   )
 
 elif [ "$MODE" = "bench" ]; then
@@ -121,7 +121,7 @@ for FPATH in "${FILES[@]}"; do
   echo "[PROGRESS] cores       : ${SLURM_CPUS_PER_TASK}" >&2
   echo "============================================================" >&2
 
-  python3 inference/run_piglasso_new.py \
+  python3 pipeline_src/inference/run_piglasso_new.py \
     --mode "$MODE" \
     --input "$FPATH" \
     --Q "$Q" \
