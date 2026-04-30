@@ -1,0 +1,4 @@
+group	n_samples	genes_before	genes_after_intersection	genes_after_mean_filter	did_mv	genes_after_mv_adjust	phase
+PHASE__Acute__n513__zscored	513	32080	16340	1634	True	164	Acute
+PHASE__Proliferation__n203__zscored	203	32080	16340	1634	True	164	Proliferation
+PHASE__Remodelling__n36__zscored	36	32080	16340	1634	True	164	Remodelling
