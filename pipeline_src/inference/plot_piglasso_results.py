@@ -51,17 +51,17 @@ FIGURES_DIR  = os.path.join(_HERE, "results", "figures")
 
 PKL_PRIOR   = os.path.join(
     PIGLASSO_DIR,
-    "PHASE__Acute__n513__zscored__filtered__Q200__bperc0.65__lam0.05-0.3x20"
+    "PHASE__Acute__n513__zscored__filtered__Q200__bperc0.65__lam0.05-1.0x20"
     "__seed42__pw0.5__piglasso_results.pkl",
 )
 PKL_NOPRIOR = os.path.join(
     PIGLASSO_DIR,
-    "PHASE__Acute__n513__zscored__filtered__Q200__bperc0.65__lam0.05-0.3x20"
+    "PHASE__Acute__n513__zscored__filtered__Q200__bperc0.65__lam0.05-1.0x20"
     "__piglasso_results.pkl",
 )
 
 # Lambda to extract the network from (most penalising = sparsest)
-NETWORK_LAMBDA = 0.30
+NETWORK_LAMBDA = 1.0
 # Stability threshold for the network edges
 NETWORK_STAB_THRESH = 1.0
 
@@ -158,23 +158,33 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     s_prior   = _stability_matrix(d_prior)
     s_noprior = _stability_matrix(d_noprior)
 
-    thresholds = [0.5, 0.8, 1.0]
-    thr_colors = {0.5: "#B4436C", 0.8: "#5CAD6E", 1.0: "#F78154"}
+    # 6 thresholds: 0.5 → 0.9 as "stability ≥ x", plus exact 1.0
+    # Using ≥ in labels to be unambiguous (code uses strict >, but for 1.0
+    # strict > is unreachable so we show = 1.0)
+    thresholds = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    thr_colors = {
+        0.5: "#4C72B0",
+        0.6: "#5CAD6E",
+        0.7: "#F2C14E",
+        0.8: "#F78154",
+        0.9: "#B4436C",
+        1.0: "#7B2D8B",
+    }
 
     counts_prior   = _edge_counts_per_lambda(s_prior,   thresholds)
     counts_noprior = _edge_counts_per_lambda(s_noprior, thresholds)
 
-    fig, ax = plt.subplots(figsize=(7, 4.5), dpi=dpi)
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=dpi)
 
     for t in thresholds:
         c = thr_colors[t]
-        label_p  = f"stability > {t}" if t < 1.0 else "stability = 1.0"
-        label_np = f"stability > {t} (no prior)" if t < 1.0 else "stability = 1.0 (no prior)"
-        ax.plot(lam, counts_prior[t],   color=c, lw=1.8,  ls="-",  label=f"{label_p}")
-        ax.plot(lam, counts_noprior[t], color=c, lw=1.4,  ls="--", label=f"{label_np}")
+        label_p  = f"stability ≥ {t}" if t < 1.0 else "stability = 1.0"
+        label_np = f"stability ≥ {t} (no prior)" if t < 1.0 else "stability = 1.0 (no prior)"
+        ax.plot(lam, counts_prior[t],   color=c, lw=1.8, ls="-",  label=label_p)
+        ax.plot(lam, counts_noprior[t], color=c, lw=1.2, ls="--", label=label_np, alpha=0.7)
 
     # Vertical line at chosen network lambda
-    ax.axvline(NETWORK_LAMBDA, color="#4C72B0", lw=1.0, ls=":", alpha=0.8,
+    ax.axvline(NETWORK_LAMBDA, color="#333333", lw=1.0, ls=":",
                label=f"network λ = {NETWORK_LAMBDA}")
 
     ax.set_xlabel("Regularisation parameter λ", fontsize=10)
@@ -186,11 +196,10 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     )
     fig.suptitle("PIGLasso stability path", fontsize=12, fontweight="bold", y=0.995)
 
-    # Clean legend: deduplicate and order
     handles, labels = ax.get_legend_handles_labels()
-    ax.legend(handles, labels, fontsize=7.5, frameon=True,
+    ax.legend(handles, labels, fontsize=7, frameon=True,
               framealpha=0.9, edgecolor="#cccccc", ncol=2,
-              loc="upper right", labelspacing=0.4)
+              loc="upper right", labelspacing=0.35)
 
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", lw=0.4, alpha=0.4)
