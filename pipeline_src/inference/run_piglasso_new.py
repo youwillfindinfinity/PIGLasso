@@ -275,7 +275,7 @@ def main():
 
     args = parser.parse_args()
 
-    project_root = Path(__file__).resolve().parents[1]  # BurnInjuries/
+    project_root = Path(__file__).resolve().parents[2]  # PIGLasso/
 
     # Mode-specific dirs
     if args.mode == "burn":

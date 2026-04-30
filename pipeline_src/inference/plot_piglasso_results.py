@@ -45,9 +45,10 @@ matplotlib.rcParams.update({
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-_HERE        = os.path.dirname(os.path.abspath(__file__))
-PIGLASSO_DIR = os.path.join(_HERE, "results", "piglasso", "GSE182616")
-FIGURES_DIR  = os.path.join(_HERE, "results", "figures")
+# pipeline_src/inference/ → up 2 levels → PIGLasso/
+_PIGLASSO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PIGLASSO_DIR   = os.path.join(_PIGLASSO_ROOT, "inference", "results", "piglasso", "GSE182616")
+FIGURES_DIR    = os.path.join(_PIGLASSO_ROOT, "inference", "results", "figures")
 
 PKL_PRIOR   = os.path.join(
     PIGLASSO_DIR,
