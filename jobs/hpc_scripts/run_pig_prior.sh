@@ -16,7 +16,7 @@ module purge
 module load 2024
 module load R/4.4.2-gfbf-2024a
 
-source /gpfs/home2/zblei/Documents/BurnInjuries/NODIS/.venv/bin/activate
+source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
 
 # ============================================================
 # CONFIG
