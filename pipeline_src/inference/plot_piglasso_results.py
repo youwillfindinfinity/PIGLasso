@@ -57,7 +57,7 @@ PKL_PRIOR   = os.path.join(
 PKL_NOPRIOR = os.path.join(
     PIGLASSO_DIR,
     "PHASE__Acute__n513__zscored__filtered__Q200__bperc0.65__lam0.05-1.0x20"
-    "__piglasso_results.pkl",
+    "__seed42__piglasso_results.pkl",
 )
 
 # Lambda to extract the network from (most penalising = sparsest)
@@ -161,25 +161,24 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     # 6 thresholds: 0.5 → 0.9 as "stability ≥ x", plus exact 1.0
     # Using ≥ in labels to be unambiguous (code uses strict >, but for 1.0
     # strict > is unreachable so we show = 1.0)
-    thresholds = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    thr_colors = {
-        0.5: "#4C72B0",
-        0.6: "#5CAD6E",
-        0.7: "#F2C14E",
-        0.8: "#F78154",
-        0.9: "#B4436C",
-        1.0: "#7B2D8B",
-    }
+    thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # Gradient across the NODIS diffusion colormap: blue → teal → yellow → orange → pink
+    import matplotlib.colors as mcolors
+    _cmap = mcolors.LinearSegmentedColormap.from_list(
+        "nodis", ["#4C72B0", "#4D9078", "#F2C14E", "#F78154", "#B4436C"], N=256)
+    thr_colors = {t: mcolors.to_hex(_cmap(i / 9))
+                  for i, t in enumerate(thresholds)}
 
     counts_prior   = _edge_counts_per_lambda(s_prior,   thresholds)
     counts_noprior = _edge_counts_per_lambda(s_noprior, thresholds)
 
     fig, ax = plt.subplots(figsize=(9, 5), dpi=dpi)
+    ax.tick_params(axis="both", labelsize=11)
 
     for t in thresholds:
         c = thr_colors[t]
-        label_p  = f"stability ≥ {t}" if t < 1.0 else "stability = 1.0"
-        label_np = f"stability ≥ {t} (no prior)" if t < 1.0 else "stability = 1.0 (no prior)"
+        label_p  = f"stability ≥ {t:.1f}" if t < 1.0 else "stability = 1.0"
+        label_np = f"≥ {t:.1f} (no prior)" if t < 1.0 else "= 1.0 (no prior)"
         ax.plot(lam, counts_prior[t],   color=c, lw=1.8, ls="-",  label=label_p)
         ax.plot(lam, counts_noprior[t], color=c, lw=1.2, ls="--", label=label_np, alpha=0.7)
 
@@ -187,19 +186,20 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     ax.axvline(NETWORK_LAMBDA, color="#333333", lw=1.0, ls=":",
                label=f"network λ = {NETWORK_LAMBDA}")
 
-    ax.set_xlabel("Regularisation parameter λ", fontsize=10)
-    ax.set_ylabel("Number of stable edges", fontsize=10)
+    ax.set_xlim(left=lam[0], right=1.0)
+    ax.set_xlabel("Regularisation parameter λ", fontsize=13)
+    ax.set_ylabel("Number of stable edges", fontsize=13)
     ax.set_title(
         "GSE182616  ·  acute phase  ·  n = 513, p = 164  ·  "
         "solid = with prior (pw = 0.5)  ·  dashed = no prior",
-        fontsize=8, color="black", pad=2,
+        fontsize=11, color="black", pad=4,
     )
-    fig.suptitle("PIGLasso stability path", fontsize=12, fontweight="bold", y=0.995)
+    fig.suptitle("PIGLasso stability path", fontsize=15, fontweight="bold", y=0.995)
 
     handles, labels = ax.get_legend_handles_labels()
-    ax.legend(handles, labels, fontsize=7, frameon=True,
-              framealpha=0.9, edgecolor="#cccccc", ncol=2,
-              loc="upper right", labelspacing=0.35)
+    ax.legend(handles, labels, fontsize=9, frameon=True,
+              framealpha=0.9, edgecolor="#cccccc", ncol=3,
+              loc="upper right", labelspacing=0.3)
 
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", lw=0.4, alpha=0.4)
