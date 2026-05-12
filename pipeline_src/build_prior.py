@@ -100,7 +100,7 @@ def _query_string_batch(
             continue
         if g1 in gene_idx and g2 in gene_idx:
             i, j = gene_idx[g1], gene_idx[g2]
-            w = exp_score / 1000.0
+            w = exp_score  # API v12 returns scores in [0, 1] directly
             if w > P[i, j]:
                 P[i, j] = w
                 P[j, i] = w
