@@ -30,7 +30,11 @@ warnings.filterwarnings("ignore")
 matplotlib.rcParams.update({
     "font.family":     "sans-serif",
     "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
-    "font.size":       9,
+    "font.size":       12,
+    "axes.labelsize":  13,
+    "xtick.labelsize": 12,
+    "ytick.labelsize": 12,
+    "legend.fontsize": 12,
     "figure.dpi":      150,
     "pdf.fonttype":    42,
     "ps.fonttype":     42,
@@ -136,10 +140,11 @@ def plot_knockout_bar(ko: pd.DataFrame, out_stem: str, dataset: str,
 
     ax.barh(range(len(genes)), scores, color=colors, edgecolor="none", height=0.7)
     ax.set_yticks(range(len(genes)))
-    ax.set_yticklabels(genes, fontsize=8.5)
+    ax.set_yticklabels(genes, fontsize=12)
     ax.invert_yaxis()
 
-    ax.set_xlabel("Perturbative impact  (max‖ΔS(t)‖₂)", fontsize=10)
+    ax.set_xlabel("Perturbative impact  (max‖ΔS(t)‖₂)", fontsize=13)
+    ax.set_ylabel("Genes", fontsize=13)
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="x", lw=0.4, alpha=0.4)
 
@@ -151,15 +156,9 @@ def plot_knockout_bar(ko: pd.DataFrame, out_stem: str, dataset: str,
     ]
     handles.append(mpatches.Patch(facecolor=UNCHARACTERISED_COLOR,
                                   edgecolor="none", label="Uncharacterised"))
-    ax.legend(handles=handles, fontsize=7.5, frameon=True,
+    ax.legend(handles=handles, fontsize=12, frameon=True,
               framealpha=0.9, edgecolor="#cccccc", loc="lower right",
               labelspacing=0.4)
-
-    fig.suptitle(f"Top {TOP_N} genes by knockout impact", fontsize=12,
-                 fontweight="bold", y=0.995)
-    ax.set_title(f"{dataset}  ·  acute phase  ·  model = {model}  ·  "
-                 f"reduction = {REDUCTION}",
-                 fontsize=8, color="black", pad=2)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):

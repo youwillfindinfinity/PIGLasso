@@ -189,12 +189,6 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     ax.set_xlim(left=lam[0], right=1.0)
     ax.set_xlabel("Regularisation parameter λ", fontsize=13)
     ax.set_ylabel("Number of stable edges", fontsize=13)
-    ax.set_title(
-        "GSE182616  ·  acute phase  ·  n = 513, p = 164  ·  "
-        "solid = with prior (pw = 0.5)  ·  dashed = no prior",
-        fontsize=11, color="black", pad=4,
-    )
-    fig.suptitle("PIGLasso stability path", fontsize=15, fontweight="bold", y=0.995)
 
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(handles, labels, fontsize=9, frameon=True,
