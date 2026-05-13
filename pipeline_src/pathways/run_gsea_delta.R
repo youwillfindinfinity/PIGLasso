@@ -53,7 +53,7 @@ meta <- read.table(META_FILE, sep = "\t", header = TRUE,
 # ---------------------------------------------------------------------------
 # Define groups
 # ---------------------------------------------------------------------------
-acute_samples    <- rownames(meta)[meta$time_bin %in% c("T0", "Early")]
+acute_samples    <- rownames(meta)[meta$time_bin %in% c("T0", "Early", "Mid")]
 recovery_samples <- rownames(meta)[meta$time_bin %in% c("Late", "FollowUp")]
 
 acute_cols    <- intersect(acute_samples,    colnames(expr))
