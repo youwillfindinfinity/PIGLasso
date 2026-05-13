@@ -1,83 +1,83 @@
 "rank","gene","knockout_impact_score","module","n_pathways_hit","n_activated","n_suppressed","top_activated_pathway","top_suppressed_pathway"
-1,"BTG1",3.21153094343948,"apoptosis",2,2,0,"fibroblast apoptotic process",NA
-2,"HIF1A",3.1850688111494,"signalling",27,27,0,"B cell homeostasis",NA
-3,"PRF1",3.17982225247854,"immune",16,16,0,"regulation of cell killing",NA
-4,"RELL1",2.4610099356942,"apoptosis",1,1,0,"positive regulation of MAPK cascade",NA
-8,"AKNA",2.28550754681531,"epigenetic",5,5,0,"negative regulation of cell adhesion",NA
-9,"PIK3IP1",2.20429572630696,"signalling",1,1,0,"negative regulation of phosphatidylinositol 3-kinase/protein kinase B signal transduction",NA
-11,"TREM1",2.14203390543376,"immune",12,12,0,"adaptive immune response",NA
-13,"JARID2",2.04968072088986,"epigenetic",6,6,0,"facultative heterochromatin formation",NA
-14,"TRIB1",2.0034253277123,"signalling",33,33,0,"negative regulation of kinase activity",NA
-15,"CASC2",1.94014965992345,"apoptosis",1,1,0,"negative regulation of MAPK cascade",NA
-16,"IGF2R",1.92647254552203,"signalling",2,2,0,"post-embryonic development",NA
-17,"RAF1",1.9254990212888,"signalling",18,18,0,"response to type II interferon",NA
-19,"AREG",1.91556605455186,"immune",4,4,0,"peptidyl-tyrosine phosphorylation",NA
-23,"NCOA2",1.79855169316212,"epigenetic",5,5,0,"intracellular receptor signaling pathway",NA
-24,"RPS6KA5",1.75913001117264,"signalling",8,8,0,"interleukin-1-mediated signaling pathway",NA
-27,"IRS2",1.73062826106417,"signalling",29,29,0,"positive regulation of leukocyte activation",NA
-33,"ATG2A",1.64308583081409,"uncharacterised",5,5,0,"autophagosome organization",NA
-34,"IL10",1.58810791089987,"immune",112,112,0,"regulation of lymphocyte mediated immunity",NA
-35,"GPR183",1.55316549851048,"uncharacterised",43,43,0,"adaptive immune response",NA
-37,"ARFGAP3",1.49963186895259,"uncharacterised",3,3,0,"vesicle targeting",NA
-39,"IKBKB",1.48654587445872,"signalling",47,47,0,"antigen processing and presentation of exogenous peptide antigen",NA
-43,"CASS4",1.37574314924952,"uncharacterised",8,8,0,"regulation of protein tyrosine kinase activity",NA
-44,"KLRD1",1.336678445381,"immune",61,61,0,"stimulatory C-type lectin receptor signaling pathway",NA
-47,"PRDM8",1.29929447891099,"epigenetic",3,3,0,"central nervous system neuron axonogenesis",NA
-48,"LAMA5",1.29380011166593,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
-50,"PRKDC",1.25429744694249,"uncharacterised",44,44,0,"immune response-activating signaling pathway",NA
-54,"HLX",1.2167889374751,"uncharacterised",68,68,0,"T-helper 1 type immune response",NA
-55,"OTX1",1.20570923554598,"uncharacterised",1,1,0,"forebrain development",NA
-58,"KIAA0319L",1.18229419572155,"uncharacterised",1,1,0,"neuron migration",NA
-60,"CD86",1.1354918830063,"immune",85,85,0,"adaptive immune response",NA
-62,"RAPGEF2",1.11894318726841,"signalling",12,12,0,"small GTPase-mediated signal transduction",NA
-64,"CD46",1.10236330273894,"uncharacterised",61,61,0,"T cell mediated immunity",NA
-65,"GK5",1.06760239726354,"uncharacterised",1,1,0,"glycerolipid metabolic process",NA
-66,"TMCC1",1.0360604771319,"uncharacterised",1,1,0,"endosomal transport",NA
-68,"RHOU",1.0051950736391,"uncharacterised",6,6,0,"regulation of small GTPase mediated signal transduction",NA
-76,"CHRNA10",0.915580438879151,"uncharacterised",2,2,0,"negative regulation of MAPK cascade",NA
-79,"TPPP",0.87969995709004,"uncharacterised",4,4,0,"negative regulation of protein modification process",NA
-81,"PLA2G7",0.840677082572889,"immune",13,13,0,"positive regulation of defense response",NA
-82,"PCGF3",0.837014474614662,"epigenetic",3,3,0,"negative regulation of gene expression, epigenetic",NA
-84,"MERTK",0.830022372393176,"immune",11,11,0,"regulation of lymphocyte activation",NA
-86,"TIGIT",0.813496541838356,"immune",20,20,0,"regulation of lymphocyte activation",NA
-94,"F11R",0.653103379849513,"uncharacterised",15,15,0,"regulation of small GTPase mediated signal transduction",NA
-95,"NR4A2",0.645187232171027,"apoptosis",8,8,0,"central nervous system neuron axonogenesis",NA
-96,"PANX2",0.638536167153396,"uncharacterised",4,4,0,"positive regulation of cytokine production",NA
-97,"ACSL3",0.621043447169535,"metabolism",2,2,0,"glycerophospholipid metabolic process",NA
-98,"STAT5A",0.585342022248935,"signalling",71,71,0,"adaptive immune response",NA
-99,"AUTS2",0.583132227764939,"epigenetic",8,8,0,"regulation of small GTPase mediated signal transduction",NA
-101,"SOCS3",0.577665821864597,"signalling",34,34,0,"adaptive immune response",NA
-102,"TRPV2",0.57155190279827,"immune",3,3,0,"positive regulation of cell development",NA
-105,"PARP16",0.532394652980396,"uncharacterised",1,1,0,"response to endoplasmic reticulum stress",NA
-106,"KALRN",0.531777070291805,"uncharacterised",4,4,0,"regulation of small GTPase mediated signal transduction",NA
-111,"KIR3DL1",0.517292522863108,"immune",6,6,0,"lymphocyte mediated immunity",NA
-112,"RPRD1A",0.515089238005672,"uncharacterised",1,1,0,"mRNA processing",NA
-114,"SNAP23",0.454122562633472,"uncharacterised",12,12,0,"leukocyte activation involved in immune response",NA
-115,"PLEKHG3",0.441836503796738,"uncharacterised",2,2,0,"regulation of small GTPase mediated signal transduction",NA
-116,"NDST1",0.428785900916424,"uncharacterised",2,2,0,"forebrain development",NA
-117,"FCRL1",0.418402929771688,"immune",1,1,0,"B cell activation",NA
-119,"BTG2",0.401073100859291,"apoptosis",9,9,0,"nuclear-transcribed mRNA poly(A) tail shortening",NA
-120,"GRAMD1C",0.387179677832508,"metabolism",1,1,0,"cellular response to alcohol",NA
-121,"DUSP2",0.387162149412648,"signalling",2,2,0,"negative regulation of MAPK cascade",NA
-124,"MARCKS",0.370657567967007,"signalling",2,2,0,"response to endoplasmic reticulum stress",NA
-127,"IFRD1",0.333862138827189,"uncharacterised",3,3,0,"negative regulation of cell development",NA
-128,"RPGR",0.330447969980468,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
-131,"DNAJB1",0.306855045272406,"apoptosis",2,2,0,"cellular response to heat",NA
-132,"SIPA1L1",0.303093210486615,"uncharacterised",5,5,0,"regulation of small GTPase mediated signal transduction",NA
-133,"CAND1",0.280568513562416,"uncharacterised",6,6,0,"positive regulation of DNA-templated transcription initiation",NA
-134,"AGFG1",0.277557065303546,"uncharacterised",3,3,0,"nucleus organization",NA
-135,"SNRK",0.276280992447317,"uncharacterised",1,1,0,"myeloid cell differentiation",NA
-137,"RGL1",0.27556139859196,"signalling",1,1,0,"small GTPase-mediated signal transduction",NA
-138,"PDE3B",0.272546918954688,"uncharacterised",5,5,0,"negative regulation of cell adhesion",NA
-139,"DOCK4",0.264735146614961,"uncharacterised",4,4,0,"small GTPase-mediated signal transduction",NA
-140,"VPS18",0.262324923890194,"uncharacterised",6,6,0,"intracellular receptor signaling pathway",NA
-144,"PTGDR",0.194144981260614,"uncharacterised",10,10,0,"leukocyte activation involved in immune response",NA
-145,"PDE4B",0.19252694423606,"uncharacterised",21,21,0,"immune response-activating cell surface receptor signaling pathway",NA
-147,"FASLG",0.182005676086224,"immune",10,10,0,"response to type II interferon",NA
-149,"PPP1R15A",0.169986094691936,"signalling",5,5,0,"negative regulation of endoplasmic reticulum unfolded protein response",NA
-153,"PIK3R5",0.139559755411316,"immune",7,7,0,"phosphatidylinositol metabolic process",NA
-154,"ACVR1B",0.131166067646177,"uncharacterised",4,4,0,"regulation of hemopoiesis",NA
-155,"DNMBP",0.129048106660685,"uncharacterised",5,5,0,"regulation of small GTPase mediated signal transduction",NA
-157,"SPAG9",0.112885700453881,"uncharacterised",5,5,0,"endosomal transport",NA
-162,"RPGRIP1",0.0942958886789729,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
-163,"CCDC146",0.0874765375899374,"uncharacterised",2,2,0,"nucleus organization",NA
+1,"HIF1A",3.18031496720717,"signalling",27,27,0,"B cell homeostasis",NA
+2,"PRF1",3.15056696364151,"immune",16,16,0,"regulation of cell killing",NA
+3,"BTG1",3.14224100624365,"apoptosis",2,2,0,"fibroblast apoptotic process",NA
+5,"RELL1",2.41604030701454,"apoptosis",1,1,0,"positive regulation of MAPK cascade",NA
+7,"AKNA",2.24359508324457,"epigenetic",5,5,0,"negative regulation of cell adhesion",NA
+9,"PIK3IP1",2.16647568120701,"signalling",1,1,0,"negative regulation of phosphatidylinositol 3-kinase/protein kinase B signal transduction",NA
+11,"TREM1",2.12747420358825,"immune",12,12,0,"adaptive immune response",NA
+13,"JARID2",1.99387482147694,"epigenetic",6,6,0,"facultative heterochromatin formation",NA
+14,"TRIB1",1.99088233007196,"signalling",33,33,0,"negative regulation of kinase activity",NA
+15,"IGF2R",1.9292587324812,"signalling",2,2,0,"post-embryonic development",NA
+16,"CASC2",1.91368487045218,"apoptosis",1,1,0,"negative regulation of MAPK cascade",NA
+17,"AREG",1.90468612803653,"immune",4,4,0,"peptidyl-tyrosine phosphorylation",NA
+21,"RAF1",1.86313574064549,"signalling",18,18,0,"response to type II interferon",NA
+22,"NCOA2",1.78982071214723,"epigenetic",5,5,0,"intracellular receptor signaling pathway",NA
+23,"RPS6KA5",1.77369096569816,"signalling",8,8,0,"interleukin-1-mediated signaling pathway",NA
+26,"IRS2",1.72769436004234,"signalling",29,29,0,"positive regulation of leukocyte activation",NA
+31,"ATG2A",1.65616757948293,"uncharacterised",5,5,0,"autophagosome organization",NA
+35,"GPR183",1.55225285778823,"uncharacterised",43,43,0,"adaptive immune response",NA
+36,"IL10",1.53888416417663,"immune",112,112,0,"regulation of lymphocyte mediated immunity",NA
+38,"ARFGAP3",1.50139416334463,"uncharacterised",3,3,0,"vesicle targeting",NA
+39,"IKBKB",1.46375580305671,"signalling",47,47,0,"antigen processing and presentation of exogenous peptide antigen",NA
+42,"PRDM8",1.36532698868922,"epigenetic",3,3,0,"central nervous system neuron axonogenesis",NA
+44,"CASS4",1.33837751742011,"uncharacterised",8,8,0,"regulation of protein tyrosine kinase activity",NA
+45,"KLRD1",1.31964106384304,"immune",61,61,0,"stimulatory C-type lectin receptor signaling pathway",NA
+46,"PRKDC",1.31300381740182,"uncharacterised",44,44,0,"immune response-activating signaling pathway",NA
+47,"HLX",1.31169728928506,"uncharacterised",68,68,0,"T-helper 1 type immune response",NA
+48,"LAMA5",1.26245107384601,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
+53,"OTX1",1.21527169083952,"uncharacterised",1,1,0,"forebrain development",NA
+57,"CD86",1.16440647895245,"immune",85,85,0,"adaptive immune response",NA
+60,"KIAA0319L",1.15084132363594,"uncharacterised",1,1,0,"neuron migration",NA
+62,"RAPGEF2",1.07937174173913,"signalling",12,12,0,"small GTPase-mediated signal transduction",NA
+63,"CD46",1.06905821285064,"uncharacterised",61,61,0,"T cell mediated immunity",NA
+64,"GK5",1.0666184664059,"uncharacterised",1,1,0,"glycerolipid metabolic process",NA
+66,"RHOU",1.04124236817067,"uncharacterised",6,6,0,"regulation of small GTPase mediated signal transduction",NA
+71,"TMCC1",0.995606794475841,"uncharacterised",1,1,0,"endosomal transport",NA
+72,"CHRNA10",0.939359735980423,"uncharacterised",2,2,0,"negative regulation of MAPK cascade",NA
+75,"TIGIT",0.91430619914332,"immune",20,20,0,"regulation of lymphocyte activation",NA
+80,"TPPP",0.879190733944663,"uncharacterised",4,4,0,"negative regulation of protein modification process",NA
+81,"PLA2G7",0.87173821981193,"immune",13,13,0,"positive regulation of defense response",NA
+84,"PCGF3",0.84950022934846,"epigenetic",3,3,0,"negative regulation of gene expression, epigenetic",NA
+85,"MERTK",0.811338047264642,"immune",11,11,0,"regulation of lymphocyte activation",NA
+94,"NR4A2",0.674728247991696,"apoptosis",8,8,0,"central nervous system neuron axonogenesis",NA
+95,"ACSL3",0.642419954528255,"metabolism",2,2,0,"glycerophospholipid metabolic process",NA
+96,"STAT5A",0.630415477326958,"signalling",71,71,0,"adaptive immune response",NA
+97,"F11R",0.613685797931618,"uncharacterised",15,15,0,"regulation of small GTPase mediated signal transduction",NA
+98,"AUTS2",0.603198543505831,"epigenetic",8,8,0,"regulation of small GTPase mediated signal transduction",NA
+99,"PANX2",0.598733659026376,"uncharacterised",4,4,0,"positive regulation of cytokine production",NA
+100,"TRPV2",0.583039313774402,"immune",3,3,0,"positive regulation of cell development",NA
+103,"SOCS3",0.56263340665906,"signalling",34,34,0,"adaptive immune response",NA
+106,"KALRN",0.535937374355586,"uncharacterised",4,4,0,"regulation of small GTPase mediated signal transduction",NA
+108,"PARP16",0.518029348594551,"uncharacterised",1,1,0,"response to endoplasmic reticulum stress",NA
+110,"RPRD1A",0.51392905062804,"uncharacterised",1,1,0,"mRNA processing",NA
+112,"SNAP23",0.509538137412422,"uncharacterised",12,12,0,"leukocyte activation involved in immune response",NA
+113,"KIR3DL1",0.502201573831915,"immune",6,6,0,"lymphocyte mediated immunity",NA
+115,"IFRD1",0.463382954685024,"uncharacterised",3,3,0,"negative regulation of cell development",NA
+117,"PLEKHG3",0.428653163830815,"uncharacterised",2,2,0,"regulation of small GTPase mediated signal transduction",NA
+118,"GRAMD1C",0.428267144192668,"metabolism",1,1,0,"cellular response to alcohol",NA
+119,"BTG2",0.423585835957041,"apoptosis",9,9,0,"nuclear-transcribed mRNA poly(A) tail shortening",NA
+120,"MARCKS",0.405883753202421,"signalling",2,2,0,"response to endoplasmic reticulum stress",NA
+121,"NDST1",0.388029667991059,"uncharacterised",2,2,0,"forebrain development",NA
+124,"DUSP2",0.354190166089255,"signalling",2,2,0,"negative regulation of MAPK cascade",NA
+125,"SNRK",0.343896122894505,"uncharacterised",1,1,0,"myeloid cell differentiation",NA
+127,"FCRL1",0.340776108369255,"immune",1,1,0,"B cell activation",NA
+130,"CAND1",0.292836636460663,"uncharacterised",6,6,0,"positive regulation of DNA-templated transcription initiation",NA
+131,"RPGR",0.28948662316781,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
+132,"DNAJB1",0.287180075554907,"apoptosis",2,2,0,"cellular response to heat",NA
+135,"SIPA1L1",0.273069624054293,"uncharacterised",5,5,0,"regulation of small GTPase mediated signal transduction",NA
+136,"RGL1",0.263281664962408,"signalling",1,1,0,"small GTPase-mediated signal transduction",NA
+137,"DOCK4",0.262120186795541,"uncharacterised",4,4,0,"small GTPase-mediated signal transduction",NA
+138,"AGFG1",0.25640570754542,"uncharacterised",3,3,0,"nucleus organization",NA
+139,"PDE3B",0.247602582365223,"uncharacterised",5,5,0,"negative regulation of cell adhesion",NA
+141,"VPS18",0.228614587107467,"uncharacterised",6,6,0,"intracellular receptor signaling pathway",NA
+143,"PPP1R15A",0.215093273869739,"signalling",5,5,0,"negative regulation of endoplasmic reticulum unfolded protein response",NA
+144,"FASLG",0.213070460342198,"immune",10,10,0,"response to type II interferon",NA
+145,"PTGDR",0.212282610986663,"uncharacterised",10,10,0,"leukocyte activation involved in immune response",NA
+148,"PDE4B",0.191215840921667,"uncharacterised",21,21,0,"immune response-activating cell surface receptor signaling pathway",NA
+154,"PIK3R5",0.13742286662888,"immune",7,7,0,"phosphatidylinositol metabolic process",NA
+155,"ACVR1B",0.129924861522697,"uncharacterised",4,4,0,"regulation of hemopoiesis",NA
+156,"SPAG9",0.129539179815497,"uncharacterised",5,5,0,"endosomal transport",NA
+160,"RPGRIP1",0.118270621654994,"uncharacterised",1,1,0,"plasma membrane bounded cell projection assembly",NA
+161,"DNMBP",0.110693683408325,"uncharacterised",5,5,0,"regulation of small GTPase mediated signal transduction",NA
+162,"CCDC146",0.0936689605998202,"uncharacterised",2,2,0,"nucleus organization",NA

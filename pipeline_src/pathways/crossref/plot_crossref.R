@@ -27,7 +27,7 @@ HERE <- tryCatch({
   dirname(normalizePath(f))
 }, error = function(e) getwd())
 ROOT     <- normalizePath(file.path(HERE, "..", "..", ".."), mustWork = FALSE)
-KO_FILE  <- file.path(ROOT, "results", "knockouts", "ranked_genes_with_modules.csv")
+KO_FILE  <- file.path(ROOT, "pipeline_src", "knockouts", "results", "ranked_genes_with_modules.csv")
 SUM_FILE <- file.path(HERE, "results", "knockout_pathway_summary.csv")
 FIG_DIR  <- file.path(HERE, "results", "figures")
 dir.create(FIG_DIR, recursive = TRUE, showWarnings = FALSE)

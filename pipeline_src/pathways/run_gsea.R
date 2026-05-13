@@ -30,7 +30,7 @@ HERE <- tryCatch({
   dirname(normalizePath(f))
 }, error = function(e) getwd())
 ROOT     <- normalizePath(file.path(HERE, "..", ".."), mustWork = FALSE)
-IN_FILE  <- file.path(ROOT, "results", "knockouts", "ranked_genes_with_modules.csv")
+IN_FILE  <- file.path(ROOT, "pipeline_src", "knockouts", "results", "ranked_genes_with_modules.csv")
 EXPR_FILE <- normalizePath(file.path(ROOT, "..", "preprocessing", "data",
                                      "plotting", "preprocessed",
                                      "burn_gene_matrix.tsv"), mustWork = FALSE)
