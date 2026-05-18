@@ -108,7 +108,7 @@ pA <- ggplot(lollipop_df, aes(x = knockout_impact_score, y = gene)) +
                     guide   = "none") +
   geom_text(data = filter(lollipop_df, has_pathway_hit),
             aes(label = n_pathways_hit),
-            hjust = -0.5, size = 3.7, colour = "#444444") +
+            hjust = 0, nudge_x = 0.08, size = 3.7, colour = "#444444") +
   scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
   labs(x = "Knockout impact score", y = NULL) +
   base_theme +
