@@ -1,4 +1,6 @@
 #!/bin/bash
+# Set PROJECT_ROOT to repo parent, or override: export PROJECT_ROOT=/path/to/BurnInjuries
+: "${PROJECT_ROOT:=$HOME/BurnInjuries}"
 #SBATCH --job-name=run_pig
 #SBATCH --time=120:00:00
 #SBATCH --cpus-per-task=24
@@ -8,14 +10,14 @@
 
 set -euo pipefail
 
-cd /gpfs/home2/zblei/Documents/BurnInjuries
+cd ${PROJECT_ROOT}
 mkdir -p logs
 
 module purge
 module load 2024
 module load R/4.4.2-gfbf-2024a
 
-source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
+source ${PROJECT_ROOT}/.venv/bin/activate
 
 INPUT_DIR="burn_data/preprocessed/filtered"
 

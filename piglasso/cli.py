@@ -138,7 +138,7 @@ def prior(step, pipeline_dir):
 @main.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def diffuse(args):
-    """Run network diffusion signal propagation (delegates to pipeline_src/diffusion/node_knockout.py).
+    """Run network diffusion signal propagation (delegates to pipeline_src/diffusion/network_diffusion.py).
 
     Pass arguments directly, e.g.:
 
@@ -147,7 +147,7 @@ def diffuse(args):
       piglasso diffuse --help
     """
     import subprocess
-    script = pathlib.Path(__file__).parent.parent / "pipeline_src" / "diffusion" / "node_knockout.py"
+    script = pathlib.Path(__file__).parent.parent / "pipeline_src" / "diffusion" / "network_diffusion.py"
     if not script.exists():
         click.echo(f"ERROR: {script} not found", err=True)
         sys.exit(1)
