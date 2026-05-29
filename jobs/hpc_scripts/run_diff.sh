@@ -1,4 +1,6 @@
 #!/bin/bash
+# Set PROJECT_ROOT to repo parent, or override: export PROJECT_ROOT=/path/to/BurnInjuries
+: "${PROJECT_ROOT:=$HOME/BurnInjuries}"
 #SBATCH --job-name=net_diff
 #SBATCH --partition=genoa
 #SBATCH --time=01:00:00
@@ -9,13 +11,13 @@
 
 set -euo pipefail
 
-cd /gpfs/home2/zblei/Documents/BurnInjuries
+cd ${PROJECT_ROOT}
 mkdir -p logs
 
 module purge
 module load 2024
 module load R/4.4.2-gfbf-2024a
-source /gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate
+source ${PROJECT_ROOT}/.venv/bin/activate
 
 # ---------------- CONFIG ----------------
 # Dataset: GSE182616 or GSE37069

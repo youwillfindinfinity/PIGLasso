@@ -1,4 +1,6 @@
 #!/bin/bash
+# Set PROJECT_ROOT to repo parent, or override: export PROJECT_ROOT=/path/to/BurnInjuries
+: "${PROJECT_ROOT:=$HOME/BurnInjuries}"
 #SBATCH --job-name=burn_preprocess
 #SBATCH --time=02:00:00
 #SBATCH --cpus-per-task=4
