@@ -38,11 +38,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-[project.urls]
-Homepage = "https://github.com/youwillfindinfinity/piglasso"
-Repository = "https://github.com/youwillfindinfinity/piglasso"
-"Bug Tracker" = "https://github.com/youwillfindinfinity/piglasso/issues"
-Changelog = "https://github.com/youwillfindinfinity/piglasso/blob/master/CHANGELOG.md"
 dependencies = [
     "nodis",
     "numpy>=1.26",
@@ -54,6 +49,12 @@ dependencies = [
     "matplotlib>=3.7",
     "requests>=2.28",
 ]
+
+[project.urls]
+Homepage = "https://github.com/youwillfindinfinity/piglasso"
+Repository = "https://github.com/youwillfindinfinity/piglasso"
+"Bug Tracker" = "https://github.com/youwillfindinfinity/piglasso/issues"
+Changelog = "https://github.com/youwillfindinfinity/piglasso/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 r = ["rpy2>=3.5"]
