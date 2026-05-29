@@ -268,14 +268,14 @@ If you use PIGLasso in your research, please cite:
 
 | Name | Role | Affiliation |
 |------|------|-------------|
-| **Roland V. Bumbuc** | Lead developer, First and corresponding author | Amsterdam UMC, University of Amsterdam |
-| **Zoe Azra Blei** | Co-Lead developer, First author | Amsterdam UMC, University of Amsterdam |
+| **Roland V. Bumbuc** | Co-developer, First and corresponding author | Amsterdam UMC, University of Amsterdam |
 | **Marcello Baryllii** | Co-developer | Amsterdam UMC, University of Amsterdam |
+| **Zoe Azra Blei** |  Developer, Co-First author & Burns case study application | Amsterdam UMC, University of Amsterdam |
 
-**Corresponding author:** Roland V. Bumbuc — rbumbuk@gmail.com
+**Corresponding author:** Roland V. Bumbuc — rbumbuc@gmail.com
 
 ---
 
 ## Licence
 
-MIT © 2026 Roland V. Bumbuc, Zoe Azra Blei, Marcello Baryllii
+MIT © 2026 Roland V. Bumbuc, Marcello Baryllii,  Zoe Azra Blei,
