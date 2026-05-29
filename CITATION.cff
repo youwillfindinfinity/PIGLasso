@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use PIGLasso in your research, please cite it as below."
+type: software
+title: "PIGLasso: Prior-Informed Graphical Lasso for transcriptomics network inference"
+version: 0.1.0
+date-released: 2026-05-30
+license: MIT
+repository-code: https://github.com/youwillfindinfinity/piglasso
+abstract: >-
+  PIGLasso is a burn-injury transcriptomics pipeline that implements
+  stability-selection graphical Lasso with biological prior integration
+  (STRING PPI + KEGG pathway co-membership). It is built on top of NODIS,
+  which provides the statistical inference layer (edge p-values, FDR control,
+  confidence intervals). PIGLasso adds prior construction, network diffusion,
+  node knockouts, pathway annotation, and GSEA for the analysis of burn injury
+  gene co-expression networks (GSE182616 / GSE236713).
+authors:
+  - family-names: Bumbuc
+    given-names: Roland V.
+    affiliation: "Amsterdam UMC, University of Amsterdam"
+    email: rbumbuc@gmail.com
+    orcid: ""
+  - family-names: Baryllii
+    given-names: Marcello
+    affiliation: "Amsterdam UMC, University of Amsterdam"
+  - family-names: Blei
+    given-names: Zoe Azra
+    affiliation: "Amsterdam UMC, University of Amsterdam"
+keywords:
+  - graphical-lasso
+  - Gaussian-graphical-models
+  - stability-selection
+  - transcriptomics
+  - gene-coexpression-networks
+  - burn-injury
+  - biological-priors
+  - network-inference
+  - bioinformatics
+references:
+  - type: software
+    title: "NODIS: NOdewise De-sparsified Inference Statistics"
+    repository-code: https://github.com/youwillfindinfinity/nodis
+    authors:
+      - family-names: Bumbuc
+        given-names: Roland V.
