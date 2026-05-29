@@ -146,7 +146,7 @@ est = PIGLassoEstimator(
     n_lambda=20,
     lambda_lo=0.05,
     lambda_hi=0.30,
-    pi_thr=0.5,
+    pi_thr=0.6,
     prior_weight=0.5,   # α: 0 = no prior effect, 1 = full prior
     n_jobs=4,
 )

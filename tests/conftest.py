@@ -19,15 +19,30 @@ try:
 except ImportError:
     pass
 
+_GGLASSO_AVAILABLE = False
+try:
+    import gglasso  # noqa: F401
+    _GGLASSO_AVAILABLE = True
+except ImportError:
+    pass
+
 
 def pytest_collection_modifyitems(items):
-    """Mark NODIS-dependent tests as skip when nodis is not installed."""
-    if _NODIS_AVAILABLE:
-        return
-    skip = pytest.mark.skip(reason="nodis not installed — pip install nodis")
+    """Mark NODIS/gglasso-dependent tests as skip when dependencies are not installed."""
     for item in items:
-        if _needs_nodis(item):
-            item.add_marker(skip)
+        if not _NODIS_AVAILABLE and _needs_nodis(item):
+            item.add_marker(pytest.mark.skip(
+                reason="nodis not installed — pip install nodis"
+            ))
+        elif _NODIS_AVAILABLE and not _GGLASSO_AVAILABLE and _needs_gglasso(item):
+            item.add_marker(pytest.mark.skip(
+                reason="gglasso not installed — pip install gglasso"
+            ))
+
+
+def _needs_gglasso(item) -> bool:
+    """Return True if the test exercises PIGLassoEstimator.fit() which requires gglasso."""
+    return _needs_nodis(item)
 
 
 def _needs_nodis(item) -> bool:
