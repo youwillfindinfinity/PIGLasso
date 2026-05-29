@@ -16,6 +16,14 @@ PIGLasso is a burn-injury transcriptomics pipeline built on top of [NODIS](https
 
 ---
 
+## Pipeline Overview
+
+![PIGLasso burn injury pipeline](BurnsPipeline.png)
+
+<sub>© 2026 Roland V. Bumbuc, Marcello Baryllii, Zoe Azra Blei — Amsterdam UMC, University of Amsterdam. All rights reserved.</sub>
+
+---
+
 ## Architecture
 
 ```
