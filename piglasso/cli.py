@@ -44,8 +44,8 @@ def main() -> None:
               help="Upper bound of lambda grid.")
 @click.option("--lambda-len", default=20, show_default=True,
               help="Number of lambda grid points.")
-@click.option("--pi-thr", default=0.5, show_default=True,
-              help="Stability threshold for edge selection.")
+@click.option("--pi-thr", default=0.6, show_default=True,
+              help="Stability threshold for edge selection (must be > 0.5).")
 @click.option("--n-jobs", default=1, show_default=True,
               help="Parallel workers (-1 = all CPUs).")
 @click.option("--seed", default=42, show_default=True, help="Random seed.")

@@ -53,7 +53,7 @@ est = PIGLassoEstimator(
     n_lambda=10,    # lambda grid points (use 20+ for real data)
     lambda_lo=0.05,
     lambda_hi=0.40,
-    pi_thr=0.5,
+    pi_thr=0.6,
     prior_weight=0.5,
     n_jobs=1,
     seed=42,
@@ -72,7 +72,7 @@ print(f"Stability score matrix: min={scores.min():.3f}, max={scores.max():.3f}")
 # ------------------------------------------------------------------
 est_noprior = PIGLassoEstimator(Q=20, b_perc=0.65, n_lambda=10,
                                 lambda_lo=0.05, lambda_hi=0.40,
-                                pi_thr=0.5, n_jobs=1, seed=42)
+                                pi_thr=0.6, n_jobs=1, seed=42)
 est_noprior.fit(X)
 adj_noprior = est_noprior.get_adjacency()
 n_edges_noprior = int(adj_noprior.sum()) // 2
