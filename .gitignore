@@ -8,9 +8,12 @@ dist/
 build/
 *.out
 *.err
+*.log
 logs/
 data/
 results/
+preprocessing/
 .env
 *.npy
 .DS_Store
+next.txt

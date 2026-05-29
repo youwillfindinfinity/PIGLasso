@@ -8,9 +8,41 @@ version = "0.1.0"
 description = "Prior-Informed Graphical Lasso for transcriptomics network inference"
 license = { text = "MIT" }
 authors = [
-    { name = "Roland V. Bumbuc" },
+    { name = "Roland V. Bumbuc", email = "rbumbuc@gmail.com" },
+    { name = "Marcello Baryllii" },
+    { name = "Zoe Azra Blei" },
 ]
+readme = "README.md"
 requires-python = ">=3.10"
+keywords = [
+    "graphical-lasso",
+    "gaussian-graphical-models",
+    "stability-selection",
+    "transcriptomics",
+    "gene-coexpression-networks",
+    "burn-injury",
+    "biological-priors",
+    "network-inference",
+    "bioinformatics",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/youwillfindinfinity/piglasso"
+Repository = "https://github.com/youwillfindinfinity/piglasso"
+"Bug Tracker" = "https://github.com/youwillfindinfinity/piglasso/issues"
+Changelog = "https://github.com/youwillfindinfinity/piglasso/blob/master/CHANGELOG.md"
 dependencies = [
     "nodis",
     "numpy>=1.26",

@@ -315,7 +315,7 @@ Knockout–pathway cross-reference (`knockouts/crossref/`) links hub genes remov
 pytest tests/ -v
 ```
 
-All 23 tests pass on the current release.
+The suite contains 23 tests. 6 pass without NODIS (import and CLI smoke tests). All 23 pass once NODIS is installed. Tests that require NODIS are automatically skipped — not failed — when NODIS is absent, so `pytest` is always safe to run in a partial environment.
 
 ---
 
