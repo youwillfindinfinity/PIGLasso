@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.1] — 2026-05-30
+
+### Fixed
+- Added missing `tqdm>=4.64` dependency (`pipeline_src/knockouts/node_knockout.py` imports it at module level, causing all `TestNodeKnockout` tests to fail with `ModuleNotFoundError`)
+- Corrected auto-transpose heuristic in `scripts/prepare_data.py`: condition was `rows > cols` but should be `rows < cols` (fewer rows than columns signals a genes×samples layout that must be transposed to samples×genes); fixes `TestPrepareData` shape assertion failures
+
+---
+
 ## [0.1.0] — 2026-05-30
 
 Initial release of the PIGLasso burn-injury transcriptomics pipeline.
@@ -50,5 +58,6 @@ Initial release of the PIGLasso burn-injury transcriptomics pipeline.
 
 ---
 
-[Unreleased]: https://github.com/youwillfindinfinity/piglasso/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/youwillfindinfinity/piglasso/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/youwillfindinfinity/piglasso/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/youwillfindinfinity/piglasso/releases/tag/v0.1.0
