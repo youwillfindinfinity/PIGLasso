@@ -55,7 +55,8 @@ def prepare_expression_matrix(
     ----------
     path       : File path (CSV/TSV/xlsx/npy) or a numpy array or DataFrame.
                  Rows can be samples OR genes — auto-detected if ``transpose``
-                 is None (the longer dimension is taken as genes).
+                 is None (fewer rows than columns → rows taken as genes, matrix
+                 is transposed to (samples, genes)).
     log        : Apply log1p transform before NPN. Use for raw count data.
     npn        : Apply nonparanormal shrinkage transform (recommended).
     min_var    : Genes with variance < min_var are removed (zero-variance filter).
@@ -104,10 +105,12 @@ def prepare_expression_matrix(
         X_raw = X_raw.T
         gene_names = []          # row names become gene names but we dropped them
     elif transpose is None:
-        # Heuristic: if more rows than columns, assume rows = genes → transpose
-        if X_raw.shape[0] > X_raw.shape[1]:
+        # Heuristic: if fewer rows than columns, assume rows = genes → transpose.
+        # Typical bioinformatics layout: genes × samples (rows = genes, cols = samples).
+        # When genes < samples the matrix has fewer rows than columns.
+        if X_raw.shape[0] < X_raw.shape[1]:
             warnings.warn(
-                f"Matrix has shape {X_raw.shape} (more rows than columns). "
+                f"Matrix has shape {X_raw.shape} (fewer rows than columns). "
                 "Assuming rows are genes — transposing so rows = samples. "
                 "Pass transpose=False to suppress this.",
                 UserWarning,
