@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "piglasso"
-version = "0.1.1"
+version = "1.0.0"
 description = "Prior-Informed Graphical Lasso for transcriptomics network inference"
 license = { text = "MIT" }
 authors = [
@@ -26,7 +26,7 @@ keywords = [
     "bioinformatics",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
