@@ -61,10 +61,11 @@ all_genes <- ko %>%
     has_pathway_hit  = n_pathways_hit > 0
   )
 
-top20_impact   <- all_genes %>% arrange(rank)          %>% head(20)
-top20_pathways <- all_genes %>% arrange(-n_pathways_hit) %>% head(20)
-bubble_set     <- bind_rows(top20_impact, top20_pathways) %>%
-  distinct(gene, .keep_all = TRUE)
+top20_impact        <- all_genes %>% arrange(rank)            %>% head(20)
+top20_pathways      <- all_genes %>% arrange(-n_pathways_hit) %>% head(20)
+top10_pathway_genes <- (all_genes %>% arrange(-n_pathways_hit) %>% head(10))$gene
+bubble_set          <- all_genes %>%
+  filter(has_pathway_hit | gene %in% top20_impact$gene)  # 82 w/ hits + any top-20 with 0 hits
 
 # ---------------------------------------------------------------------------
 # Shared theme
@@ -109,7 +110,8 @@ pA <- ggplot(lollipop_df, aes(x = knockout_impact_score, y = gene)) +
   geom_text(data = filter(lollipop_df, has_pathway_hit),
             aes(label = n_pathways_hit),
             hjust = 0, nudge_x = 0.08, size = 3.7, colour = "#444444") +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12)),
+                     labels = scales::number_format(accuracy = 0.01)) +
   labs(x = "Knockout impact score", y = NULL) +
   base_theme +
   theme(legend.position = "right")
@@ -128,7 +130,12 @@ zoom_data <- bubble_set %>%
   filter(knockout_impact_score >= ZOOM_X[1] & knockout_impact_score <= ZOOM_X[2] &
          n_pathways_hit        >= ZOOM_Y[1] & n_pathways_hit        <= ZOOM_Y[2])
 
-# Main plot — label only genes outside the zoom region or with many pathway hits
+# Labels: top 20 by impact (dark navy), top 10 by pathways hit (dark red, exclusive)
+top20_genes <- top20_impact$gene
+IMPACT_LBL_COLOUR  <- "#1F618D"   # deep steel blue
+PATHWAY_LBL_COLOUR <- "#A93226"   # dark crimson
+
+# Main plot — all genes as points; labels for top 20 impact + top 10 pathway coverage
 pB_main <- ggplot(bubble_set,
                   aes(x = knockout_impact_score, y = n_pathways_hit,
                       colour = module)) +
@@ -138,38 +145,67 @@ pB_main <- ggplot(bubble_set,
            ymin = ZOOM_Y[1], ymax = ZOOM_Y[2],
            fill = NA, colour = "#444444", linewidth = 0.6, linetype = "dashed") +
   geom_text_repel(
-    data = bubble_set %>% filter(!(knockout_impact_score >= ZOOM_X[1] &
+    data = bubble_set %>% filter(gene %in% top20_genes &
+                                 !(knockout_impact_score >= ZOOM_X[1] &
                                    knockout_impact_score <= ZOOM_X[2] &
                                    n_pathways_hit        >= ZOOM_Y[1] &
                                    n_pathways_hit        <= ZOOM_Y[2]) &
                                  gene != "TREM1"),
-    aes(label = gene), size = 3.7, colour = "#333333",
+    aes(label = gene), size = 3.7, colour = IMPACT_LBL_COLOUR,
     box.padding = 0.6, point.padding = 0.4,
     segment.size = 0.3, segment.colour = "#aaaaaa",
-    min.segment.length = 0, force = 3, seed = 42) +
+    min.segment.length = 0, force = 3, seed = 42,
+    max.overlaps = Inf) +
   geom_text_repel(
     data = bubble_set %>% filter(gene == "TREM1"),
-    aes(label = gene), size = 3.7, colour = "#333333",
+    aes(label = gene), size = 3.7, colour = IMPACT_LBL_COLOUR,
     nudge_y = 4, direction = "y",
     segment.size = 0.3, segment.colour = "#aaaaaa",
     min.segment.length = 0) +
+  geom_text_repel(
+    data = bubble_set %>% filter(gene %in% top10_pathway_genes &
+                                 !gene %in% top20_genes &
+                                 gene != "IL10" &
+                                 !(knockout_impact_score >= ZOOM_X[1] &
+                                   knockout_impact_score <= ZOOM_X[2] &
+                                   n_pathways_hit        >= ZOOM_Y[1] &
+                                   n_pathways_hit        <= ZOOM_Y[2])),
+    aes(label = gene), size = 3.7, colour = PATHWAY_LBL_COLOUR,
+    box.padding = 0.6, point.padding = 0.4,
+    segment.size = 0.3, segment.colour = "#e8aaaa",
+    min.segment.length = 0, force = 3, seed = 99,
+    max.overlaps = Inf) +
+  geom_text_repel(
+    data = bubble_set %>% filter(gene == "IL10"),
+    aes(label = gene), size = 3.7, colour = PATHWAY_LBL_COLOUR,
+    nudge_x = -0.25, direction = "x",
+    segment.size = 0.3, segment.colour = "#e8aaaa",
+    min.segment.length = 0) +
   scale_colour_manual(values = MODULE_COLOURS, name = "Module") +
+  scale_x_continuous(labels = scales::number_format(accuracy = 0.01)) +
   labs(x = "Knockout impact score", y = "Pathways hit (n)") +
+  guides(colour = guide_legend(nrow = 1)) +
   base_theme +
-  theme(legend.position      = c(0.01, 0.99),
-        legend.justification = c(0, 1),
-        legend.background    = element_rect(fill = "white", colour = NA))
+  theme(legend.position = "none")
 
 # Inset zoom plot
 pB_inset <- ggplot(zoom_data,
                    aes(x = knockout_impact_score, y = n_pathways_hit,
                        colour = module)) +
   geom_point(size = 2.5, alpha = 0.85) +
-  geom_text_repel(aes(label = gene), size = 3.1, colour = "#333333",
+  geom_text_repel(data = zoom_data %>% filter(gene %in% top20_genes),
+                  aes(label = gene), size = 3.1, colour = IMPACT_LBL_COLOUR,
                   box.padding = 0.6, point.padding = 0.4,
                   segment.size = 0.3, segment.colour = "#aaaaaa",
                   min.segment.length = 0, force = 12, force_pull = 0.5,
                   seed = 7, max.overlaps = Inf) +
+  geom_text_repel(data = zoom_data %>% filter(gene %in% top10_pathway_genes &
+                                              !gene %in% top20_genes),
+                  aes(label = gene), size = 3.1, colour = PATHWAY_LBL_COLOUR,
+                  box.padding = 0.6, point.padding = 0.4,
+                  segment.size = 0.3, segment.colour = "#e8aaaa",
+                  min.segment.length = 0, force = 12,
+                  seed = 99, max.overlaps = Inf) +
   scale_colour_manual(values = MODULE_COLOURS) +
   coord_cartesian(xlim = ZOOM_X, ylim = ZOOM_Y) +
   theme_classic(base_size = 9, base_family = "Arial") +
@@ -179,17 +215,97 @@ pB_inset <- ggplot(zoom_data,
         axis.text        = element_text(size = 8),
         plot.background  = element_rect(fill = "white", colour = NA))
 
-# Combine with cowplot inset
+# Combine with cowplot inset + marginal density strips
 if (requireNamespace("cowplot", quietly = TRUE)) {
   library(cowplot)
-  pB <- ggdraw(pB_main) +
-    draw_plot(pB_inset, x = 0.52, y = 0.50, width = 0.45, height = 0.47)
+
+  # Top marginal: KDE of knockout_impact_score coloured by module
+  p_top <- ggplot(bubble_set,
+                  aes(x = knockout_impact_score, fill = module, colour = module)) +
+    geom_density(alpha = 0.35, linewidth = 0.7) +
+    scale_fill_manual(values = MODULE_COLOURS) +
+    scale_colour_manual(values = MODULE_COLOURS) +
+    scale_x_continuous(labels = scales::number_format(accuracy = 0.01)) +
+    labs(y = "Density") +
+    theme_void() +
+    theme(legend.position    = "none",
+          axis.title.y       = element_text(size = 9, colour = "#555555", angle = 90,
+                                            margin = margin(r = 4)),
+          axis.line.x.bottom = element_line(colour = "#555555", linewidth = 0.5),
+          axis.line.y.left   = element_line(colour = "#555555", linewidth = 0.5),
+          plot.background    = element_rect(fill = "white", colour = NA),
+          panel.background   = element_rect(fill = "white", colour = NA))
+
+  # Right marginal: KDE of n_pathways_hit coloured by module (rotated)
+  p_right <- ggplot(bubble_set,
+                    aes(x = n_pathways_hit, fill = module, colour = module)) +
+    geom_density(alpha = 0.35, linewidth = 0.7) +
+    scale_fill_manual(values = MODULE_COLOURS) +
+    scale_colour_manual(values = MODULE_COLOURS) +
+    labs(y = "Density") +
+    coord_flip() +
+    theme_void() +
+    theme(legend.position    = "none",
+          axis.title.x       = element_text(size = 9, colour = "#555555",
+                                            margin = margin(t = 4)),
+          axis.line.x.bottom = element_line(colour = "#555555", linewidth = 0.5),
+          axis.line.y.left   = element_line(colour = "#555555", linewidth = 0.5),
+          plot.background    = element_rect(fill = "white", colour = NA),
+          panel.background   = element_rect(fill = "white", colour = NA))
+
+  # Align strips to share panel extents with main scatter
+  av <- align_plots(pB_main, p_top,   align = "v", axis = "lr")
+  ah <- align_plots(pB_main, p_right, align = "h", axis = "tb")
+
+  # Assemble 2×2 grid: [top strip | empty] / [main scatter | right strip]
+  pB_grid <- plot_grid(
+    av[[2]], ggplot() + theme_void(),
+    av[[1]], ah[[2]],
+    ncol = 2, rel_widths = c(5.5, 1), rel_heights = c(1, 5.5)
+  )
+
+  # Overlay zoom inset — scale original coords to main-scatter cell fraction
+  mw <- 5.5 / 6.5
+  mh <- 5.5 / 6.5
+  pB_with_inset <- ggdraw(pB_grid) +
+    draw_plot(pB_inset,
+              x = 0.52 * mw, y = 0.50 * mh,
+              width = 0.45 * mw, height = 0.47 * mh)
+
+  # Module legend (1 row, all modules) extracted from pB_main
+  p_for_mod_leg <- pB_main +
+    theme(legend.position  = "bottom",
+          legend.direction = "horizontal",
+          legend.text      = element_text(size = 11, family = "Arial"),
+          legend.title     = element_text(size = 11, family = "Arial"))
+  module_leg <- get_legend(p_for_mod_leg)
+
+  # Label-colour legend (1 row, coloured text only — no marker symbols)
+  label_leg <- ggplot() +
+    annotate("text", x = 0,   y = 1, label = "Label colour",
+             hjust = 0, size = 3.8, colour = "black", family = "Arial") +
+    annotate("text", x = 1.4, y = 1, label = "Top 20 by impact score",
+             hjust = 0, size = 3.8, colour = IMPACT_LBL_COLOUR, family = "Arial") +
+    annotate("text", x = 3.5, y = 1, label = "Top 10 by pathway coverage",
+             hjust = 0, size = 3.8, colour = PATHWAY_LBL_COLOUR, family = "Arial") +
+    xlim(-0.2, 6.5) + ylim(0.5, 1.5) +
+    theme_void() +
+    theme(plot.background  = element_rect(fill = "white", colour = NA),
+          panel.background = element_rect(fill = "white", colour = NA))
+
+  # Stack: main + inset / module legend / label legend
+  pB <- plot_grid(
+    pB_with_inset,
+    module_leg,
+    label_leg,
+    ncol = 1, rel_heights = c(6.5, 0.45, 0.4)
+  )
 } else {
   message("[NOTE] Install cowplot for inset zoom; saving main plot only")
   pB <- pB_main
 }
 
-save_fig(pB, "optionB_bubble", w = 10, h = 6.5)
+save_fig(pB, "optionB_bubble", w = 10, h = 7.5)
 
 # ---------------------------------------------------------------------------
 # Option C — Two-panel horizontal bars

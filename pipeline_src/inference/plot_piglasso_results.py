@@ -29,6 +29,7 @@ import warnings
 import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 
@@ -189,6 +190,7 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     ax.set_xlim(left=lam[0], right=1.0)
     ax.set_xlabel("Regularisation parameter λ", fontsize=13)
     ax.set_ylabel("Number of stable edges", fontsize=13)
+    ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.2f}"))
 
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(handles, labels, fontsize=9, frameon=True,
