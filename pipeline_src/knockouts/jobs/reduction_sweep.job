@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=reduction_sweep
+#SBATCH --output=logs/reduction_sweep_%j.out
+#SBATCH --error=logs/reduction_sweep_%j.err
+#SBATCH --time=01:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16384M
+#
+# Knockout reduction-factor sweep (6 values: 0.02, 0.05, 0.10, 0.20, 0.30, 0.50)
+# Runs node_knockout.py sequentially via run_reduction_sweep.py.
+#
+# Submit:
+#   sbatch --partition=rome jobs/reduction_sweep.job
+
+KNOCKOUTS_DIR="/gpfs/home2/zblei/Documents/BurnInjuries/PIGLasso/pipeline_src/knockouts"
+
+[[ -f "/gpfs/home2/zblei/Documents/BurnInjuries/snellius_modules.sh" ]] && \
+    source "/gpfs/home2/zblei/Documents/BurnInjuries/snellius_modules.sh"
+source "/gpfs/home2/zblei/Documents/BurnInjuries/.venv/bin/activate"
+
+mkdir -p "$KNOCKOUTS_DIR/logs"
+
+python "$KNOCKOUTS_DIR/run_reduction_sweep.py"

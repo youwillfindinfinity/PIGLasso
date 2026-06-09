@@ -97,13 +97,13 @@ pA <- ggplot(stacked, aes(x = total_pathways, y = module, fill = score_tier)) +
   labs(x = "Total pathways hit", y = NULL) +
   theme_classic(base_size = 11, base_family = "Arial") +
   theme(
-    axis.text.y      = element_text(size = 10, colour = "black", face = "plain",
+    axis.text.y      = element_text(size = 12, colour = "black", face = "plain",
                                     family = "Arial"),
-    axis.text.x      = element_text(size = 9, family = "Arial"),
-    axis.title.x     = element_text(size = 10, family = "Arial"),
+    axis.text.x      = element_text(size = 12, family = "Arial"),
+    axis.title.x     = element_text(size = 13, family = "Arial"),
     legend.position  = "bottom",
-    legend.title     = element_text(size = 9),
-    legend.text      = element_text(size = 8),
+    legend.title     = element_text(size = 13),
+    legend.text      = element_text(size = 12),
     legend.key.size  = unit(0.4, "cm"),
     legend.direction = "horizontal",
     plot.margin      = margin(5.5, 0, 5.5, 5.5)
@@ -132,8 +132,8 @@ pB <- ggplot(box_df, aes(x = knockout_impact_score, y = module, fill = module)) 
   theme_classic(base_size = 11, base_family = "Arial") +
   theme(
     axis.text.y   = element_blank(),
-    axis.text.x   = element_text(size = 9,  family = "Arial"),
-    axis.title.x  = element_text(size = 10, family = "Arial"),
+    axis.text.x   = element_text(size = 12, family = "Arial"),
+    axis.title.x  = element_text(size = 13, family = "Arial"),
     plot.margin   = margin(5.5, 5.5, 5.5, 0)
   )
 
@@ -148,4 +148,19 @@ ggsave(file.path(FIG_DIR, "module_summary.pdf"),
 ggsave(file.path(FIG_DIR, "module_summary.png"),
        p_combined, width = 9, height = 4.5, dpi = 200, device = agg_png)
 message("[SAVED] module_summary")
+
+# Titled version
+p_combined_titled <- p_combined +
+  plot_annotation(
+    title = "Module-level knockout summary",
+    theme = theme(
+      plot.title = element_text(size = 18, face = "bold", hjust = 0.5,
+                                family = "Arial", margin = margin(b = 6))
+    )
+  )
+ggsave(file.path(FIG_DIR, "module_summary_titled.pdf"),
+       p_combined_titled, width = 9, height = 5.0, device = cairo_pdf)
+ggsave(file.path(FIG_DIR, "module_summary_titled.png"),
+       p_combined_titled, width = 9, height = 5.0, dpi = 200, device = agg_png)
+message("[SAVED] module_summary_titled")
 message("[DONE]")

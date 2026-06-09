@@ -151,7 +151,7 @@ def _edge_counts_per_lambda(stab: np.ndarray, thresholds) -> dict:
 # Plot 1 — Lambda stability path
 # ---------------------------------------------------------------------------
 
-def plot_lambda_path(out_stem: str, dpi: int = 200):
+def plot_lambda_path(out_stem: str, dpi: int = 200, title=None):
     d_prior   = _load_pkl(PKL_PRIOR)
     d_noprior = _load_pkl(PKL_NOPRIOR)
 
@@ -159,11 +159,7 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     s_prior   = _stability_matrix(d_prior)
     s_noprior = _stability_matrix(d_noprior)
 
-    # 6 thresholds: 0.5 → 0.9 as "stability ≥ x", plus exact 1.0
-    # Using ≥ in labels to be unambiguous (code uses strict >, but for 1.0
-    # strict > is unreachable so we show = 1.0)
     thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    # Gradient across the NODIS diffusion colormap: blue → teal → yellow → orange → pink
     import matplotlib.colors as mcolors
     _cmap = mcolors.LinearSegmentedColormap.from_list(
         "nodis", ["#4C72B0", "#4D9078", "#F2C14E", "#F78154", "#B4436C"], N=256)
@@ -174,7 +170,11 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
     counts_noprior = _edge_counts_per_lambda(s_noprior, thresholds)
 
     fig, ax = plt.subplots(figsize=(9, 5), dpi=dpi)
-    ax.tick_params(axis="both", labelsize=11)
+    fig.subplots_adjust(top=0.82 if title else 0.92)
+    ax.tick_params(axis="both", labelsize=13)
+
+    if title:
+        fig.suptitle(title, fontsize=16, fontweight="bold", y=0.98)
 
     for t in thresholds:
         c = thr_colors[t]
@@ -183,17 +183,16 @@ def plot_lambda_path(out_stem: str, dpi: int = 200):
         ax.plot(lam, counts_prior[t],   color=c, lw=1.8, ls="-",  label=label_p)
         ax.plot(lam, counts_noprior[t], color=c, lw=1.2, ls="--", label=label_np, alpha=0.7)
 
-    # Vertical line at chosen network lambda
     ax.axvline(NETWORK_LAMBDA, color="#333333", lw=1.0, ls=":",
                label=f"network λ = {NETWORK_LAMBDA}")
 
     ax.set_xlim(left=lam[0], right=1.0)
-    ax.set_xlabel("Regularisation parameter λ", fontsize=13)
-    ax.set_ylabel("Number of stable edges", fontsize=13)
+    ax.set_xlabel("Regularisation parameter λ", fontsize=15)
+    ax.set_ylabel("Number of stable edges", fontsize=15)
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.2f}"))
 
     handles, labels = ax.get_legend_handles_labels()
-    ax.legend(handles, labels, fontsize=9, frameon=True,
+    ax.legend(handles, labels, fontsize=13, frameon=True,
               framealpha=0.9, edgecolor="#cccccc", ncol=3,
               loc="upper right", labelspacing=0.3)
 
@@ -415,8 +414,11 @@ def main():
     os.makedirs(FIGURES_DIR, exist_ok=True)
 
     if not args.no_path:
-        print("Plotting lambda stability path …")
+        print("Plotting lambda stability path (no title) …")
         plot_lambda_path(os.path.join(FIGURES_DIR, "lambda_path"), dpi=args.dpi)
+        print("Plotting lambda stability path (with title) …")
+        plot_lambda_path(os.path.join(FIGURES_DIR, "lambda_path_titled"), dpi=args.dpi,
+                         title="PIGLasso stability path")
 
     if not args.no_network:
         print("Plotting network figure …")

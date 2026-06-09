@@ -74,8 +74,8 @@ base_theme <- theme_classic(base_size = 12, base_family = "Arial") +
   theme(
     axis.text  = element_text(size = 11),
     axis.title = element_text(size = 12),
-    legend.text  = element_text(size = 11),
-    legend.title = element_text(size = 11),
+    legend.text  = element_text(size = 13),
+    legend.title = element_text(size = 13),
     plot.title   = element_text(size = 13, face = "bold")
   )
 
@@ -276,18 +276,18 @@ if (requireNamespace("cowplot", quietly = TRUE)) {
   p_for_mod_leg <- pB_main +
     theme(legend.position  = "bottom",
           legend.direction = "horizontal",
-          legend.text      = element_text(size = 11, family = "Arial"),
-          legend.title     = element_text(size = 11, family = "Arial"))
+          legend.text      = element_text(size = 13, family = "Arial"),
+          legend.title     = element_text(size = 13, family = "Arial"))
   module_leg <- get_legend(p_for_mod_leg)
 
   # Label-colour legend (1 row, coloured text only — no marker symbols)
   label_leg <- ggplot() +
     annotate("text", x = 0,   y = 1, label = "Label colour",
-             hjust = 0, size = 3.8, colour = "black", family = "Arial") +
+             hjust = 0, size = 4.6, colour = "black", family = "Arial") +
     annotate("text", x = 1.4, y = 1, label = "Top 20 by impact score",
-             hjust = 0, size = 3.8, colour = IMPACT_LBL_COLOUR, family = "Arial") +
+             hjust = 0, size = 4.6, colour = IMPACT_LBL_COLOUR, family = "Arial") +
     annotate("text", x = 3.5, y = 1, label = "Top 10 by pathway coverage",
-             hjust = 0, size = 3.8, colour = PATHWAY_LBL_COLOUR, family = "Arial") +
+             hjust = 0, size = 4.6, colour = PATHWAY_LBL_COLOUR, family = "Arial") +
     xlim(-0.2, 6.5) + ylim(0.5, 1.5) +
     theme_void() +
     theme(plot.background  = element_rect(fill = "white", colour = NA),
@@ -306,6 +306,13 @@ if (requireNamespace("cowplot", quietly = TRUE)) {
 }
 
 save_fig(pB, "optionB_bubble", w = 10, h = 7.5)
+
+# Titled version
+title_row  <- ggdraw() +
+  draw_label("Knockout impact score and pathway coverage",
+             fontface = "bold", size = 18, hjust = 0.5, fontfamily = "Arial")
+pB_titled  <- plot_grid(title_row, pB, ncol = 1, rel_heights = c(0.06, 1))
+save_fig(pB_titled, "optionB_bubble_titled", w = 10, h = 8.0)
 
 # ---------------------------------------------------------------------------
 # Option C — Two-panel horizontal bars
